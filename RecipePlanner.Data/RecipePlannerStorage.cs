@@ -4,7 +4,8 @@ using RecipePlanner.Domain;
 namespace RecipePlanner.Data {
     public interface IRecipePlannerStorage {
         Task SaveSeedDataAsync(CancellationToken ct = default);
-        Task<List<Recipe>> GetAllRecipesAsync(CancellationToken ct = default);
+        Task<List<RecipeRow>> GetAllRecipesAsync(CancellationToken ct = default);
+        Task<List<IngredientRow>> GetAllIngredientRowsAsync(CancellationToken ct = default);
 
 
     }
@@ -19,17 +20,37 @@ namespace RecipePlanner.Data {
         }
 
 
-        public async Task<List<Recipe>> GetAllRecipesAsync(CancellationToken ct = default) {
+        public async Task<List<RecipeRow>> GetAllRecipesAsync(CancellationToken ct = default) {
             using var db = _factory.CreateDbContext();
 
             return await db.Recipes
-                .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Ingredient)
-                .Include(r => r.RecipeIngredients)
-                    .ThenInclude(ri => ri.Unit)
-                .ToListAsync();
+                .OrderBy(r => r.Name)
+                .Select(r => new RecipeRow(
+                    r.Id,
+                    r.Name,
+                    (int?)r.PrepTime,
+                    r.RecipeIngredients.Select(ri => new RecipeIngredientRow(
+                        ri.IngredientId,
+                        ri.Ingredient.Name,
+                        ri.NumberOfUnits,
+                        ri.Unit.Name
+                )).ToList()
+            ))
+            .ToListAsync(ct);
         }
 
+        public async Task<List<IngredientRow>> GetAllIngredientRowsAsync(CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+
+            return await db.Ingredients
+                .OrderBy(i => i.Name)
+                .Select(i => new IngredientRow(
+                    i.Id,
+                    i.Name,
+                    i.DefaultUnit != null ? i.DefaultUnit.Name : null
+                ))
+                .ToListAsync();
+        }
 
 
 
