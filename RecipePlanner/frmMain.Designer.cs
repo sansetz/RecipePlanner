@@ -27,19 +27,45 @@
         ///  the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            btnSeedTest = new Button();
+            btnTest = new Button();
             SuspendLayout();
+            // 
+            // btnSeedTest
+            // 
+            btnSeedTest.Location = new Point(68, 36);
+            btnSeedTest.Name = "btnSeedTest";
+            btnSeedTest.Size = new Size(143, 162);
+            btnSeedTest.TabIndex = 0;
+            btnSeedTest.Text = "Seed Test";
+            btnSeedTest.UseVisualStyleBackColor = true;
+            btnSeedTest.Click += btnSeedTest_ClickAsync;
+            // 
+            // btnTest
+            // 
+            btnTest.Location = new Point(475, 112);
+            btnTest.Name = "btnTest";
+            btnTest.Size = new Size(150, 46);
+            btnTest.TabIndex = 1;
+            btnTest.Text = "Test";
+            btnTest.UseVisualStyleBackColor = true;
+            btnTest.Click += btnTest_ClickAsync;
             // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnTest);
+            Controls.Add(btnSeedTest);
             Name = "frmMain";
             Text = "Form1";
-            Load += frmMain_Load;
             ResumeLayout(false);
         }
 
         #endregion
+
+        private Button btnSeedTest;
+        private Button btnTest;
     }
 }

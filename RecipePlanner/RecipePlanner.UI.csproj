@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RecipePlanner.App\RecipePlanner.App.csproj" />
     <ProjectReference Include="..\RecipePlanner.Data\RecipePlanner.Data.csproj" />
   </ItemGroup>
 

@@ -1,0 +1,97 @@
+﻿using Microsoft.EntityFrameworkCore;
+using RecipePlanner.Domain;
+
+namespace RecipePlanner.Data {
+    public interface IRecipePlannerStorage {
+        Task SaveSeedDataAsync(CancellationToken ct = default);
+        Task<List<Recipe>> GetAllRecipesAsync(CancellationToken ct = default);
+
+
+    }
+
+
+
+    public class RecipePlannerStorage : IRecipePlannerStorage {
+        private readonly IRecipePlannerDbContextFactory _factory;
+
+        public RecipePlannerStorage(IRecipePlannerDbContextFactory factory) {
+            _factory = factory;
+        }
+
+
+        public async Task<List<Recipe>> GetAllRecipesAsync(CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+
+            return await db.Recipes
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Ingredient)
+                .Include(r => r.RecipeIngredients)
+                    .ThenInclude(ri => ri.Unit)
+                .ToListAsync();
+        }
+
+
+
+
+        public async Task SaveSeedDataAsync(CancellationToken ct = default) {
+
+            using var db = _factory.CreateDbContext();
+
+            // Voorkom dubbel seeden: als er al recepten zijn, stoppen.
+            if (db.Recipes.Any()) {
+                return;
+            }
+
+            // Units
+            var gram = new Unit { Name = "gram" };
+            var stuk = new Unit { Name = "stuk" };
+            db.Units.AddRange(gram, stuk);
+            await db.SaveChangesAsync(); // nodig zodat gram.Id/stuk.Id beschikbaar zijn
+
+            // Ingredients (met DefaultUnitId)
+            var broccoli = new Ingredient { Name = "Broccoli", DefaultUnitId = gram.Id };
+            var rijst = new Ingredient { Name = "Rijst", DefaultUnitId = gram.Id };
+            var ui = new Ingredient { Name = "Ui", DefaultUnitId = stuk.Id };
+            db.Ingredients.AddRange(broccoli, rijst, ui);
+            await db.SaveChangesAsync();
+
+            // Recipes
+            var r1 = new Recipe { Name = "Broccoli rijst", PrepTime = PrepTime.Short };
+            var r2 = new Recipe { Name = "Rijst met ui", PrepTime = PrepTime.Short };
+            db.Recipes.AddRange(r1, r2);
+            await db.SaveChangesAsync();
+
+            // RecipeIngredient (koppelingen + hoeveelheden)
+            db.RecipeIngredients.AddRange(
+                new RecipeIngredient {
+                    RecipeId = r1.Id,
+                    IngredientId = broccoli.Id,
+                    UnitId = gram.Id,
+                    NumberOfUnits = 300 // of 300m als decimal
+                },
+                new RecipeIngredient {
+                    RecipeId = r1.Id,
+                    IngredientId = rijst.Id,
+                    UnitId = gram.Id,
+                    NumberOfUnits = 200
+                },
+                new RecipeIngredient {
+                    RecipeId = r2.Id,
+                    IngredientId = rijst.Id,
+                    UnitId = gram.Id,
+                    NumberOfUnits = 200
+                },
+                new RecipeIngredient {
+                    RecipeId = r2.Id,
+                    IngredientId = ui.Id,
+                    UnitId = stuk.Id,
+                    NumberOfUnits = 1
+                }
+            );
+
+            await db.SaveChangesAsync();
+
+        }
+
+    }
+}
