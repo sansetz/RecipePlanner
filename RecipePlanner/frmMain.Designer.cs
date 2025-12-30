@@ -1,6 +1,6 @@
 ﻿namespace RecipePlanner
 {
-    partial class Form1
+    partial class frmMain
     {
         /// <summary>
         ///  Required designer variable.
@@ -26,12 +26,18 @@
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+        private void InitializeComponent() {
+            SuspendLayout();
+            // 
+            // frmMain
+            // 
+            AutoScaleDimensions = new SizeF(13F, 32F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Name = "frmMain";
+            Text = "Form1";
+            Load += frmMain_Load;
+            ResumeLayout(false);
         }
 
         #endregion
