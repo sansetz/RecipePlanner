@@ -3,11 +3,11 @@ using RecipePlanner.Data;
 
 namespace RecipePlanner.UI {
 
-    public partial class frmRecipes : Form {
+    public partial class RecipesForm : Form {
         private readonly IRecipePlannerDbContextFactory _dbFactory;
         private readonly RecipePlannerService _recipePlannerService;
 
-        public frmRecipes(IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
+        public RecipesForm(IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
             InitializeComponent();
             _dbFactory = dbFactory;
             _recipePlannerService = recipePlannerService;

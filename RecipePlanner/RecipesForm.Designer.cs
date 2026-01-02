@@ -1,5 +1,5 @@
 ﻿namespace RecipePlanner.UI {
-    partial class frmRecipes {
+    partial class RecipesForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -46,14 +46,15 @@
             gridRecipes.Size = new Size(1018, 472);
             gridRecipes.TabIndex = 1;
             // 
-            // frmRecipes
+            // RecipesForm
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1018, 647);
             Controls.Add(gridRecipes);
             Controls.Add(panel1);
-            Name = "frmRecipes";
+            Name = "RecipesForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "frmRecipe";
             Load += frmRecipes_LoadAsync;
             ((System.ComponentModel.ISupportInitialize)gridRecipes).EndInit();

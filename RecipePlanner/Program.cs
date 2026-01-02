@@ -16,12 +16,12 @@ namespace RecipePlanner {
             var services = new ServiceCollection();
             services.AddRecipePlannerInfraCore();
             services.AddRecipePlannerApplicationCore();
-            services.AddTransient<frmMain>();
-            services.AddTransient<frmIngredients>();
-            services.AddTransient<frmRecipes>();
+            services.AddTransient<MainForm>();
+            services.AddTransient<IngredientsForm>();
+            services.AddTransient<RecipesForm>();
 
             ServiceProvider = services.BuildServiceProvider();
-            var mainForm = ServiceProvider.GetRequiredService<frmMain>();
+            var mainForm = ServiceProvider.GetRequiredService<MainForm>();
             Application.Run(mainForm);
 
 

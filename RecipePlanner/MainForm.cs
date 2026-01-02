@@ -4,11 +4,11 @@ using RecipePlanner.Data;
 using RecipePlanner.UI;
 
 namespace RecipePlanner {
-    public partial class frmMain : Form {
+    public partial class MainForm : Form {
         private readonly IRecipePlannerDbContextFactory _dbFactory;
         private readonly RecipePlannerService _recipePlannerService;
 
-        public frmMain(IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
+        public MainForm(IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
             InitializeComponent();
             _dbFactory = dbFactory;
             _recipePlannerService = recipePlannerService;
@@ -32,15 +32,15 @@ namespace RecipePlanner {
 
         }
 
-        private void btnIngredients_Click(object sender, EventArgs e) {
+        private void IngredientsButton_Click(object sender, EventArgs e) {
             using var scope = Program.ServiceProvider.CreateScope();
-            var frm = scope.ServiceProvider.GetRequiredService<frmIngredients>();
+            var frm = scope.ServiceProvider.GetRequiredService<IngredientsForm>();
             frm.ShowDialog(this);
         }
 
-        private void btnRecipes_Click(object sender, EventArgs e) {
+        private void RecipesButton_Click(object sender, EventArgs e) {
             using var scope = Program.ServiceProvider.CreateScope();
-            var frm = scope.ServiceProvider.GetRequiredService<frmRecipes>();
+            var frm = scope.ServiceProvider.GetRequiredService<RecipesForm>();
             frm.ShowDialog(this);
         }
     }

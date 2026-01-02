@@ -5,9 +5,16 @@ using RecipePlanner.Entities;
 
 namespace RecipePlanner.Data {
     public interface IRecipePlannerStorage {
-        Task SaveSeedDataAsync(CancellationToken ct = default);
-        Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
+        Task<List<Unit>> GetAllUnitsAsync(CancellationToken ct = default);
+
         Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default);
+        Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default);
+        Task<int> AddIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
+        Task UpdateIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
+
+        Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
+
+        Task SaveSeedDataAsync(CancellationToken ct = default);
 
     }
 
@@ -18,20 +25,17 @@ namespace RecipePlanner.Data {
             _factory = factory;
         }
 
-
-        public async Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default) {
+        // ***************** Units *****************
+        public async Task<List<Unit>> GetAllUnitsAsync(CancellationToken ct = default) {
             using var db = _factory.CreateDbContext();
 
-            return await db.Recipes
-                .OrderBy(r => r.Name)
-                .Select(r => new RecipeListItem(
-                    r.Id,
-                    r.Name,
-                    r.PrepTime
-            ))
-            .ToListAsync(ct);
+            return await db.Units
+                .OrderBy(u => u.Name)
+                .ToListAsync();
         }
 
+
+        // ***************** Ingredients *****************
         public async Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default) {
             using var db = _factory.CreateDbContext();
 
@@ -45,8 +49,41 @@ namespace RecipePlanner.Data {
                 .ToListAsync();
         }
 
+        public async Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+
+            return await db.Ingredients
+                .FirstOrDefaultAsync(i => i.Id == id, ct);
+        }
+
+        public async Task<int> AddIngredientAsync(Ingredient ingredient, CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+            db.Ingredients.Add(ingredient);
+            await db.SaveChangesAsync(ct);
+            return ingredient.Id;
+        }
+        public async Task UpdateIngredientAsync(Ingredient ingredient, CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+            db.Ingredients.Update(ingredient);
+            await db.SaveChangesAsync(ct);
+        }
+
+        // ***************** Recipes *****************
+        public async Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+
+            return await db.Recipes
+                .OrderBy(r => r.Name)
+                .Select(r => new RecipeListItem(
+                    r.Id,
+                    r.Name,
+                    r.PrepTime
+            ))
+            .ToListAsync(ct);
+        }
 
 
+        // ***************** Seed Data *****************
         public async Task SaveSeedDataAsync(CancellationToken ct = default) {
 
             using var db = _factory.CreateDbContext();
