@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RecipePlanner.Contracts\RecipePlanner.Contracts.csproj" />
-    <ProjectReference Include="..\RecipePlanner.Data\RecipePlanner.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RecipePlanner.Domain;
+using RecipePlanner.Contracts.Ingredient;
+using RecipePlanner.Contracts.Recipe;
+using RecipePlanner.Entities;
 
 namespace RecipePlanner.Data {
     public interface IRecipePlannerStorage {
         Task SaveSeedDataAsync(CancellationToken ct = default);
-        Task<List<RecipeRow>> GetAllRecipesAsync(CancellationToken ct = default);
-        Task<List<IngredientRow>> GetAllIngredientRowsAsync(CancellationToken ct = default);
-
+        Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
+        Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default);
 
     }
-
-
 
     public class RecipePlannerStorage : IRecipePlannerStorage {
         private readonly IRecipePlannerDbContextFactory _factory;
@@ -20,31 +19,25 @@ namespace RecipePlanner.Data {
         }
 
 
-        public async Task<List<RecipeRow>> GetAllRecipesAsync(CancellationToken ct = default) {
+        public async Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default) {
             using var db = _factory.CreateDbContext();
 
             return await db.Recipes
                 .OrderBy(r => r.Name)
-                .Select(r => new RecipeRow(
+                .Select(r => new RecipeListItem(
                     r.Id,
                     r.Name,
-                    (int?)r.PrepTime,
-                    r.RecipeIngredients.Select(ri => new RecipeIngredientRow(
-                        ri.IngredientId,
-                        ri.Ingredient.Name,
-                        ri.NumberOfUnits,
-                        ri.Unit.Name
-                )).ToList()
+                    r.PrepTime
             ))
             .ToListAsync(ct);
         }
 
-        public async Task<List<IngredientRow>> GetAllIngredientRowsAsync(CancellationToken ct = default) {
+        public async Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default) {
             using var db = _factory.CreateDbContext();
 
             return await db.Ingredients
                 .OrderBy(i => i.Name)
-                .Select(i => new IngredientRow(
+                .Select(i => new IngredientListItem(
                     i.Id,
                     i.Name,
                     i.DefaultUnit != null ? i.DefaultUnit.Name : null

@@ -20,7 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RecipePlanner.Domain\RecipePlanner.Domain.csproj" />
+    <ProjectReference Include="..\RecipePlanner.Contracts\RecipePlanner.Contracts.csproj" />
+    <ProjectReference Include="..\RecipePlanner.Domain\RecipePlanner.Entities.csproj" />
   </ItemGroup>
 
 </Project>

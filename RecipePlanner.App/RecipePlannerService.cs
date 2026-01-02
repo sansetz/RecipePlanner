@@ -1,4 +1,6 @@
-﻿using RecipePlanner.Data;
+﻿using RecipePlanner.Contracts.Ingredient;
+using RecipePlanner.Contracts.Recipe;
+using RecipePlanner.Data;
 
 namespace RecipePlanner.App {
     public class RecipePlannerService {
@@ -13,27 +15,29 @@ namespace RecipePlanner.App {
         public async Task<List<RecipeListItem>> GetAllRecipesAsync() {
             var rows = await _storage.GetAllRecipesAsync();
 
-            return rows.Select(r => new RecipeListItem {
-                Id = r.Id,
-                Name = r.Name,
-            }).ToList();
+            return rows.Select(r => new RecipeListItem(
+                    r.Id,
+                    r.Name,
+                    r.PrepTime
+            )).ToList();
         }
         public async Task<List<IngredientListItem>> GetAllIngredientsAsync() {
-            var rows = await _storage.GetAllIngredientRowsAsync();
+            var rows = await _storage.GetAllIngredientsAsync();
 
-            return rows.Select(r => new IngredientListItem {
-                Id = r.Id,
-                Name = r.Name,
-                DefaultUnitName = r.DefaultUnitName
-            }).ToList();
+            return rows
+                .Select(r => new IngredientListItem(
+                    r.Id,
+                    r.Name,
+                    r.DefaultUnitName
+                ))
+                .ToList();
         }
 
-        public async Task<List<RecipeRow>> GetOverlapRecipes(int recipeId) {
+        public async Task<List<RecipeListItem>> GetOverlapRecipes(int recipeId) {
 
-            var allRecipes = await _storage.GetAllRecipesAsync();
+            return await _storage.GetAllRecipesAsync();
 
             //todo: dit is niet goed, moet aangepast worden
-            return allRecipes.ToList();
 
             //var selectedIngredientIds = allRecipes
             //    .Where(r => r.Id == recipeId)

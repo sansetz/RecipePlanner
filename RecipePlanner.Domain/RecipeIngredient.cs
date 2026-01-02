@@ -1,4 +1,4 @@
-﻿namespace RecipePlanner.Domain {
+﻿namespace RecipePlanner.Entities {
     public class RecipeIngredient {
 
         public int RecipeId { get; set; }

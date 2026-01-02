@@ -18,6 +18,7 @@ namespace RecipePlanner {
             services.AddRecipePlannerApplicationCore();
             services.AddTransient<frmMain>();
             services.AddTransient<frmIngredients>();
+            services.AddTransient<frmRecipes>();
 
             ServiceProvider = services.BuildServiceProvider();
             var mainForm = ServiceProvider.GetRequiredService<frmMain>();

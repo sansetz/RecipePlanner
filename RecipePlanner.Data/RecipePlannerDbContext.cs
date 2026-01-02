@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RecipePlanner.Domain;
+using RecipePlanner.Entities;
 
 namespace RecipePlanner.Data {
 

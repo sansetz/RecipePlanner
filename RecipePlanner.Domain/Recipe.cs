@@ -1,4 +1,6 @@
-﻿namespace RecipePlanner.Domain {
+﻿using RecipePlanner.Contracts.Recipe;
+
+namespace RecipePlanner.Entities {
     public class Recipe {
         public int Id { get; set; }
         public required string Name { get; set; }

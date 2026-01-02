@@ -37,5 +37,11 @@ namespace RecipePlanner {
             var frm = scope.ServiceProvider.GetRequiredService<frmIngredients>();
             frm.ShowDialog(this);
         }
+
+        private void btnRecipes_Click(object sender, EventArgs e) {
+            using var scope = Program.ServiceProvider.CreateScope();
+            var frm = scope.ServiceProvider.GetRequiredService<frmRecipes>();
+            frm.ShowDialog(this);
+        }
     }
 }

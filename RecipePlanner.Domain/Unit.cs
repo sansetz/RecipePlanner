@@ -1,4 +1,4 @@
-﻿namespace RecipePlanner.Domain {
+﻿namespace RecipePlanner.Entities {
     public class Unit {
 
         public int Id { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace RecipePlanner.Domain {
+﻿using RecipePlanner.Contracts.Recipe;
+
+namespace RecipePlanner.Entities {
     public class PlannedDay {
         public int Id { get; set; }
         public required DateOnly Date { get; set; }

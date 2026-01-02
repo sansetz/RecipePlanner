@@ -27,58 +27,44 @@
         ///  the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            btnSeedTest = new Button();
-            btnTest = new Button();
             btnIngredients = new Button();
+            btnRecipes = new Button();
             SuspendLayout();
-            // 
-            // btnSeedTest
-            // 
-            btnSeedTest.Location = new Point(68, 36);
-            btnSeedTest.Name = "btnSeedTest";
-            btnSeedTest.Size = new Size(143, 162);
-            btnSeedTest.TabIndex = 0;
-            btnSeedTest.Text = "Seed Test";
-            btnSeedTest.UseVisualStyleBackColor = true;
-            btnSeedTest.Click += btnSeedTest_ClickAsync;
-            // 
-            // btnTest
-            // 
-            btnTest.Location = new Point(475, 112);
-            btnTest.Name = "btnTest";
-            btnTest.Size = new Size(150, 46);
-            btnTest.TabIndex = 1;
-            btnTest.Text = "Test";
-            btnTest.UseVisualStyleBackColor = true;
-            btnTest.Click += btnTest_ClickAsync;
             // 
             // btnIngredients
             // 
-            btnIngredients.Location = new Point(604, 232);
+            btnIngredients.Location = new Point(153, 82);
             btnIngredients.Name = "btnIngredients";
-            btnIngredients.Size = new Size(123, 39);
+            btnIngredients.Size = new Size(248, 71);
             btnIngredients.TabIndex = 2;
             btnIngredients.Text = "Ingredients";
             btnIngredients.UseVisualStyleBackColor = true;
             btnIngredients.Click += btnIngredients_Click;
+            // 
+            // btnRecipes
+            // 
+            btnRecipes.Location = new Point(153, 172);
+            btnRecipes.Name = "btnRecipes";
+            btnRecipes.Size = new Size(248, 68);
+            btnRecipes.TabIndex = 3;
+            btnRecipes.Text = "Recipes";
+            btnRecipes.UseVisualStyleBackColor = true;
+            btnRecipes.Click += btnRecipes_Click;
             // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnRecipes);
             Controls.Add(btnIngredients);
-            Controls.Add(btnTest);
-            Controls.Add(btnSeedTest);
             Name = "frmMain";
             Text = "Form1";
             ResumeLayout(false);
         }
 
         #endregion
-
-        private Button btnSeedTest;
-        private Button btnTest;
         private Button btnIngredients;
+        private Button btnRecipes;
     }
 }
