@@ -13,80 +13,72 @@ namespace RecipePlanner.UI {
         }
 
         private async void IngredientsForm_LoadAsync(object sender, EventArgs e) {
-            IngredientsGrid.AutoGenerateColumns = true;
-            IngredientsGrid.ReadOnly = true;
-
-            UpdateIngredient.Enabled = false;
             await LoadIngredients();
-            ConfigIngredientsGrid();
+
+            IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
+
+            IngredientsListView.AddClicked += IngredientsListView_AddClickedAsync;
+            IngredientsListView.UpdateClicked += IngredientsListView_UpdateClickedAsync;
+            IngredientsListView.DeleteClicked += IngredientsListView_DeleteClickedAsync;
+        }
+
+        private async void IngredientsListView_AddClickedAsync(object? sender, EventArgs e) {
+            using var scope = Program.ServiceProvider.CreateScope();
+            var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
+            await frm.ShowDialogForCreateAsync(this);
+            await LoadIngredients();
+        }
+        private async void IngredientsListView_UpdateClickedAsync(object? sender, EventArgs e) {
+            var ingredientId = GetSelectedIngredientId(sender);
+
+            using var scope = Program.ServiceProvider.CreateScope();
+            var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
+            await frm.ShowDialogForUpdateAsync(ingredientId, this);
+
+            await LoadIngredients();
+        }
+
+        private int GetSelectedIngredientId(object? ingredient) {
+            if (ingredient is null)
+                throw new InvalidOperationException("No ingredient selected.");
+
+            var selected = ((EntityListViewControl)ingredient).SelectedItem;
+
+            if (selected == null || selected is not IngredientListItem item)
+                throw new InvalidOperationException("No ingredient selected.");
+
+            return item.Id;
+        }
+
+        private async void IngredientsListView_DeleteClickedAsync(object? sender, EventArgs e) {
+            var ingredientId = GetSelectedIngredientId(sender);
+
+            await _recipePlannerService.DeleteIngredientAsync(ingredientId);
+            await LoadIngredients();
+
+
         }
 
         private async Task LoadIngredients() {
             var ingredients = await _recipePlannerService.GetAllIngredientsAsync();
-            IngredientsGrid.DataSource = ingredients;
+            IngredientsListView.BindData(ingredients);
         }
-        private void ConfigIngredientsGrid() {
-            if (IngredientsGrid.Rows.Count > 0) {
-                IngredientsGrid.Rows[0].Selected = true;
-                UpdateIngredient.Enabled = true;
-            }
+        private void ExtraGridConfig(DataGridView grid) {
 
-            var idColumn = IngredientsGrid.Columns["Id"];
-            if (idColumn != null)
-                idColumn.Visible = false;
-
-            IngredientsGrid.AllowUserToResizeColumns = false;
-            IngredientsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-            var nameColumn = IngredientsGrid.Columns["Name"];
+            var nameColumn = grid.Columns["Name"];
             if (nameColumn != null) {
                 nameColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 nameColumn.HeaderText = "Naam";
             }
 
-            var defUnitColumn = IngredientsGrid.Columns["DefaultUnitName"];
+            var defUnitColumn = grid.Columns["DefaultUnitName"];
             if (defUnitColumn != null) {
                 defUnitColumn.HeaderText = "Eenheid";
             }
 
         }
 
-        private async void NewIngredient_ClickAsync(object sender, EventArgs e) {
-            using var scope = Program.ServiceProvider.CreateScope();
-            var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
-            await frm.ShowDialogForCreateAsync(this);
-            await LoadIngredients();
 
-        }
 
-        private async void SaveIngredient_ClickAsync(object sender, EventArgs e) {
-            var ingredients = await _recipePlannerService.GetAllIngredientsAsync();
-            IngredientsGrid.DataSource = ingredients;
-        }
-
-        private void IngredientsGrid_SelectionChanged(object sender, EventArgs e) {
-            if (IngredientsGrid.CurrentRow?.DataBoundItem is not IngredientListItem row)
-                return;
-
-            UpdateIngredient.Enabled = IsRowSelected();
-        }
-
-        private bool IsRowSelected() {
-            if (IngredientsGrid.Rows.Count == 0)
-                return false;
-
-            return IngredientsGrid.CurrentRow?.DataBoundItem is IngredientListItem;
-        }
-
-        private async void UpdateIngredient_ClickAsync(object sender, EventArgs e) {
-            if (IngredientsGrid.CurrentRow?.DataBoundItem is not IngredientListItem row)
-                return;
-
-            using var scope = Program.ServiceProvider.CreateScope();
-            var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
-            await frm.ShowDialogForUpdateAsync(row.Id, this);
-
-            await LoadIngredients();
-
-        }
     }
 }

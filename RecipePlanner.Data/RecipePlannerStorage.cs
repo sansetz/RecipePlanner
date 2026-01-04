@@ -11,6 +11,7 @@ namespace RecipePlanner.Data {
         Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default);
         Task<int> AddIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
         Task UpdateIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
+        Task DeleteIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
 
         Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
 
@@ -65,6 +66,11 @@ namespace RecipePlanner.Data {
         public async Task UpdateIngredientAsync(Ingredient ingredient, CancellationToken ct = default) {
             using var db = _factory.CreateDbContext();
             db.Ingredients.Update(ingredient);
+            await db.SaveChangesAsync(ct);
+        }
+        public async Task DeleteIngredientAsync(Ingredient ingredient, CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+            db.Ingredients.Remove(ingredient);
             await db.SaveChangesAsync(ct);
         }
 

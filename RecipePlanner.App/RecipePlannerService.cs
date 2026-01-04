@@ -10,9 +10,6 @@ namespace RecipePlanner.App {
         public RecipePlannerService(IRecipePlannerStorage storage) {
             _storage = storage;
         }
-        public async Task SaveSeedDataAsync() {
-            await _storage.SaveSeedDataAsync();
-        }
 
         //***************** Units *****************
 
@@ -68,6 +65,14 @@ namespace RecipePlanner.App {
             await _storage.UpdateIngredientAsync(ingredient, ct);
         }
 
+        public async Task DeleteIngredientAsync(int id, CancellationToken ct = default) {
+            //for delete ingredient should exist
+            var ingredient = await _storage.GetIngredientByIdAsync(id, ct) ??
+                throw new ArgumentException("Ingredient not found.", nameof(id));
+
+            await _storage.DeleteIngredientAsync(ingredient, ct);
+        }
+
         //***************** Recipes **********************
 
         public async Task<List<RecipeListItem>> GetAllRecipesAsync() {
@@ -100,5 +105,11 @@ namespace RecipePlanner.App {
             //    .ToList();
 
         }
+
+        //***************** Seed Data **********************
+        public async Task SaveSeedDataAsync() {
+            await _storage.SaveSeedDataAsync();
+        }
+
     }
 }
