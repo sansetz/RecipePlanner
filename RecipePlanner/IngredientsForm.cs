@@ -5,12 +5,10 @@ using RecipePlanner.Data;
 
 namespace RecipePlanner.UI {
     public partial class IngredientsForm : Form {
-        private readonly IRecipePlannerDbContextFactory _dbFactory;
         private readonly RecipePlannerService _recipePlannerService;
 
         public IngredientsForm(IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
             InitializeComponent();
-            _dbFactory = dbFactory;
             _recipePlannerService = recipePlannerService;
         }
 
@@ -28,7 +26,10 @@ namespace RecipePlanner.UI {
             IngredientsGrid.DataSource = ingredients;
         }
         private void ConfigIngredientsGrid() {
-            IngredientsGrid.Rows[0].Selected = true;
+            if (IngredientsGrid.Rows.Count > 0) {
+                IngredientsGrid.Rows[0].Selected = true;
+                UpdateIngredient.Enabled = true;
+            }
 
             var idColumn = IngredientsGrid.Columns["Id"];
             if (idColumn != null)
@@ -39,7 +40,7 @@ namespace RecipePlanner.UI {
         private async void NewIngredient_ClickAsync(object sender, EventArgs e) {
             using var scope = Program.ServiceProvider.CreateScope();
             var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
-            frm.ShowDialogForCreate(this);
+            await frm.ShowDialogForCreateAsync(this);
             await LoadIngredients();
 
         }
@@ -49,15 +50,19 @@ namespace RecipePlanner.UI {
             IngredientsGrid.DataSource = ingredients;
         }
 
-        private async void IngredientsGrid_SelectionChangedAsync(object sender, EventArgs e) {
+        private void IngredientsGrid_SelectionChanged(object sender, EventArgs e) {
             if (IngredientsGrid.CurrentRow?.DataBoundItem is not IngredientListItem row)
                 return;
 
-            UpdateIngredient.Enabled = true;
-
-
+            UpdateIngredient.Enabled = IsRowSelected();
         }
 
+        private bool IsRowSelected() {
+            if (IngredientsGrid.Rows.Count == 0)
+                return false;
+
+            return IngredientsGrid.CurrentRow?.DataBoundItem is IngredientListItem;
+        }
 
         private async void UpdateIngredient_ClickAsync(object sender, EventArgs e) {
             if (IngredientsGrid.CurrentRow?.DataBoundItem is not IngredientListItem row)

@@ -42,6 +42,10 @@ namespace RecipePlanner.App {
             int? defaultUnitId,
             CancellationToken ct = default
         ) {
+            name = name.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name is required.", nameof(name));
+
             var ingredient = new Ingredient {
                 Name = name,
                 DefaultUnitId = defaultUnitId

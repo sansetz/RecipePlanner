@@ -82,7 +82,7 @@
             IngredientsGrid.ScrollBars = ScrollBars.Vertical;
             IngredientsGrid.Size = new Size(1067, 872);
             IngredientsGrid.TabIndex = 1;
-            IngredientsGrid.SelectionChanged += IngredientsGrid_SelectionChangedAsync;
+            IngredientsGrid.SelectionChanged += IngredientsGrid_SelectionChanged;
             // 
             // IngredientsForm
             // 

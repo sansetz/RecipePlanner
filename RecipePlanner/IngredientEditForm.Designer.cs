@@ -33,10 +33,11 @@
             // 
             // SaveIngredient
             // 
+            SaveIngredient.DialogResult = DialogResult.OK;
             SaveIngredient.Location = new Point(599, 231);
             SaveIngredient.Name = "SaveIngredient";
             SaveIngredient.Size = new Size(236, 59);
-            SaveIngredient.TabIndex = 10;
+            SaveIngredient.TabIndex = 4;
             SaveIngredient.Text = "Opslaan";
             SaveIngredient.UseVisualStyleBackColor = true;
             SaveIngredient.Click += SaveIngredient_ClickAsync;
@@ -47,7 +48,7 @@
             label2.Location = new Point(30, 97);
             label2.Name = "label2";
             label2.Size = new Size(143, 32);
-            label2.TabIndex = 9;
+            label2.TabIndex = 2;
             label2.Text = "Default Unit";
             // 
             // UnitSelector
@@ -56,7 +57,7 @@
             UnitSelector.Location = new Point(206, 94);
             UnitSelector.Name = "UnitSelector";
             UnitSelector.Size = new Size(306, 40);
-            UnitSelector.TabIndex = 8;
+            UnitSelector.TabIndex = 3;
             // 
             // label1
             // 
@@ -64,7 +65,7 @@
             label1.Location = new Point(30, 45);
             label1.Name = "label1";
             label1.Size = new Size(78, 32);
-            label1.TabIndex = 7;
+            label1.TabIndex = 0;
             label1.Text = "Name";
             // 
             // IngredientName
@@ -72,14 +73,15 @@
             IngredientName.Location = new Point(206, 38);
             IngredientName.Name = "IngredientName";
             IngredientName.Size = new Size(472, 39);
-            IngredientName.TabIndex = 6;
+            IngredientName.TabIndex = 1;
             // 
             // Cancel
             // 
+            Cancel.DialogResult = DialogResult.Cancel;
             Cancel.Location = new Point(357, 231);
             Cancel.Name = "Cancel";
             Cancel.Size = new Size(236, 59);
-            Cancel.TabIndex = 11;
+            Cancel.TabIndex = 5;
             Cancel.Text = "Annuleren";
             Cancel.UseVisualStyleBackColor = true;
             Cancel.Click += Cancel_Click;
@@ -101,7 +103,6 @@
             Name = "IngredientEditForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Edit Ingredient";
-            Load += IngredientEditForm_LoadAsync;
             ResumeLayout(false);
             PerformLayout();
         }
