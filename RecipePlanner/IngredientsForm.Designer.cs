@@ -40,7 +40,7 @@
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1067, 98);
+            panel1.Size = new Size(799, 98);
             panel1.TabIndex = 0;
             // 
             // DeleteIngredient
@@ -80,7 +80,7 @@
             IngredientsGrid.Name = "IngredientsGrid";
             IngredientsGrid.RowHeadersWidth = 82;
             IngredientsGrid.ScrollBars = ScrollBars.Vertical;
-            IngredientsGrid.Size = new Size(1067, 872);
+            IngredientsGrid.Size = new Size(799, 872);
             IngredientsGrid.TabIndex = 1;
             IngredientsGrid.SelectionChanged += IngredientsGrid_SelectionChanged;
             // 
@@ -88,9 +88,10 @@
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1067, 970);
+            ClientSize = new Size(799, 970);
             Controls.Add(IngredientsGrid);
             Controls.Add(panel1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "IngredientsForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Ingredienten";

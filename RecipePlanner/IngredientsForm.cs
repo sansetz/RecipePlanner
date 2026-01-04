@@ -35,6 +35,19 @@ namespace RecipePlanner.UI {
             if (idColumn != null)
                 idColumn.Visible = false;
 
+            IngredientsGrid.AllowUserToResizeColumns = false;
+            IngredientsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            var nameColumn = IngredientsGrid.Columns["Name"];
+            if (nameColumn != null) {
+                nameColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                nameColumn.HeaderText = "Naam";
+            }
+
+            var defUnitColumn = IngredientsGrid.Columns["DefaultUnitName"];
+            if (defUnitColumn != null) {
+                defUnitColumn.HeaderText = "Eenheid";
+            }
+
         }
 
         private async void NewIngredient_ClickAsync(object sender, EventArgs e) {
