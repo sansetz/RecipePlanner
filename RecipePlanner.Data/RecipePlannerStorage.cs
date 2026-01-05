@@ -14,6 +14,10 @@ namespace RecipePlanner.Data {
         Task DeleteIngredientAsync(int id, CancellationToken ct = default);
 
         Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
+        Task<Recipe?> GetRecipeByIdAsync(int id, CancellationToken ct = default);
+        Task<int> AddRecipeAsync(string name, PrepTime preptime, CancellationToken ct = default);
+        Task UpdateRecipeAsync(int id, string name, PrepTime preptime, CancellationToken ct = default);
+        Task DeleteRecipeAsync(int id, CancellationToken ct = default);
 
         Task SaveSeedDataAsync(CancellationToken ct = default);
 
@@ -75,7 +79,7 @@ namespace RecipePlanner.Data {
 
             var ingredient = await db.Ingredients.FindAsync([id], ct);
             if (ingredient is null)
-                throw new InvalidOperationException("Ingrediënt bestaat niet (meer).");
+                throw new InvalidOperationException("Ingredient not available in DB");
 
             ingredient.Name = name;
             ingredient.DefaultUnitId = defaultUnitId;
@@ -87,7 +91,7 @@ namespace RecipePlanner.Data {
 
             var ingredient = await db.Ingredients.FindAsync([id], ct);
             if (ingredient is null)
-                throw new InvalidOperationException("Ingrediënt bestaat niet (meer).");
+                throw new InvalidOperationException("Ingredient not available in DB");
 
             db.Ingredients.Remove(ingredient);
 
@@ -107,6 +111,47 @@ namespace RecipePlanner.Data {
                     r.PrepTime
             ))
             .ToListAsync(ct);
+        }
+        public async Task<Recipe?> GetRecipeByIdAsync(int id, CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+
+            return await db.Recipes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == id, ct);
+        }
+
+        public async Task<int> AddRecipeAsync(string name, PrepTime preptime, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            var recipe = new Recipe { Name = name, PrepTime = preptime };
+
+            db.Recipes.Add(recipe);
+            await db.SaveChangesAsync(ct);
+
+            return recipe.Id;
+        }
+        public async Task UpdateRecipeAsync(int id, string name, PrepTime preptime, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            var recipe = await db.Recipes.FindAsync([id], ct);
+            if (recipe is null)
+                throw new InvalidOperationException("Recipe not available in DB");
+
+            recipe.Name = name;
+            recipe.PrepTime = preptime;
+
+            await db.SaveChangesAsync(ct);
+        }
+        public async Task DeleteRecipeAsync(int id, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            var recipe = await db.Recipes.FindAsync([id], ct);
+            if (recipe is null)
+                throw new InvalidOperationException("Recipe not available in DB");
+
+            db.Recipes.Remove(recipe);
+
+            await db.SaveChangesAsync(ct);
         }
 
 

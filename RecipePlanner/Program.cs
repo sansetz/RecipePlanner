@@ -10,6 +10,10 @@ namespace RecipePlanner {
         /// </summary>
         [STAThread]
         static void Main() {
+            // TODO's:
+            // - Add boolean field to ingredient for marking if it should be used for finding overlap recipes
+
+
             ApplicationConfiguration.Initialize();
 
             var services = new ServiceCollection();
@@ -20,6 +24,7 @@ namespace RecipePlanner {
             services.AddTransient<IngredientsForm>();
             services.AddTransient<RecipesForm>();
             services.AddTransient<IngredientEditForm>();
+            services.AddTransient<RecipeEditForm>();
 
             using var serviceProvider = services.BuildServiceProvider();
             var mainForm = serviceProvider.GetRequiredService<MainForm>();

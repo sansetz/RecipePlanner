@@ -21,6 +21,7 @@ namespace RecipePlanner.UI {
             await LoadUnitsAsync();
             UnitSelector.SelectedIndex = -1;
 
+            this.Text = "Nieuw ingredient aanmaken";
             base.ShowDialog(owner);
         }
 
@@ -37,6 +38,7 @@ namespace RecipePlanner.UI {
             await LoadUnitsAsync();
 
             UnitSelector.SelectedValue = ingredient.DefaultUnitId;
+            this.Text = "Ingredient bewerken";
 
             base.ShowDialog(owner);
         }

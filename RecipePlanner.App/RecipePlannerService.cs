@@ -74,6 +74,38 @@ namespace RecipePlanner.App {
             )).ToList();
         }
 
+        public async Task<Recipe?> GetRecipeByIdAsync(int id, CancellationToken ct = default) {
+            return await _storage.GetRecipeByIdAsync(id, ct);
+        }
+
+        public async Task<int> CreateRecipeAsync(
+                    string name,
+                    PrepTime preptime,
+                    CancellationToken ct = default
+        ) {
+            name = name.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name is required", nameof(name));
+
+            return await _storage.AddRecipeAsync(name, preptime, ct);
+        }
+
+        public async Task UpdateRecipeAsync(
+            int id,
+            string name,
+            PrepTime preptime,
+            CancellationToken ct = default
+        ) {
+            name = name.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name is required.", nameof(name));
+
+            await _storage.UpdateRecipeAsync(id, name, preptime, ct);
+        }
+
+        public async Task DeleteRecipeAsync(int id, CancellationToken ct = default) {
+            await _storage.DeleteRecipeAsync(id, ct);
+        }
 
         public async Task<List<RecipeListItem>> GetOverlapRecipes(int recipeId) {
 
