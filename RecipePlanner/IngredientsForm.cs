@@ -1,19 +1,19 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RecipePlanner.App;
 using RecipePlanner.Contracts.Ingredient;
-using RecipePlanner.Data;
 
 namespace RecipePlanner.UI {
     public partial class IngredientsForm : Form {
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly RecipePlannerService _recipePlannerService;
 
-        public IngredientsForm(IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
+        public IngredientsForm(IServiceScopeFactory scopeFactory, RecipePlannerService recipePlannerService) {
             InitializeComponent();
+            _scopeFactory = scopeFactory;
             _recipePlannerService = recipePlannerService;
         }
-
         private async void IngredientsForm_LoadAsync(object sender, EventArgs e) {
-            await LoadIngredients();
+            await LoadIngredientsAsync();
 
             IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
 
@@ -23,43 +23,69 @@ namespace RecipePlanner.UI {
         }
 
         private async void IngredientsListView_AddClickedAsync(object? sender, EventArgs e) {
-            using var scope = Program.ServiceProvider.CreateScope();
-            var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
-            await frm.ShowDialogForCreateAsync(this);
-            await LoadIngredients();
+            try {
+                using var scope = _scopeFactory.CreateScope();
+                var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
+                await frm.ShowDialogForCreateAsync(this);
+                await LoadIngredientsAsync();
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
         private async void IngredientsListView_UpdateClickedAsync(object? sender, EventArgs e) {
-            var ingredientId = GetSelectedIngredientId(sender);
+            try {
+                if (sender is not EntityListViewControl list) {
+                    throw new InvalidOperationException("Event sender is not EntityListViewControl.");
+                }
 
-            using var scope = Program.ServiceProvider.CreateScope();
-            var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
-            await frm.ShowDialogForUpdateAsync(ingredientId, this);
+                var ingredientId = GetSelectedIngredientId(list);
 
-            await LoadIngredients();
+                if (ingredientId == null)
+                    return;
+
+                using var scope = _scopeFactory.CreateScope();
+                var frm = scope.ServiceProvider.GetRequiredService<IngredientEditForm>();
+                await frm.ShowDialogForUpdateAsync(ingredientId.Value, this);
+
+                await LoadIngredientsAsync();
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private int GetSelectedIngredientId(object? ingredient) {
-            if (ingredient is null)
-                throw new InvalidOperationException("No ingredient selected.");
+        private async void IngredientsListView_DeleteClickedAsync(object? sender, EventArgs e) {
+            try {
+                if (sender is not EntityListViewControl list) {
+                    throw new InvalidOperationException("Event sender is not EntityListViewControl.");
+                }
 
-            var selected = ((EntityListViewControl)ingredient).SelectedItem;
+                var ingredientId = GetSelectedIngredientId(list);
+                if (ingredientId == null)
+                    return;
 
-            if (selected == null || selected is not IngredientListItem item)
-                throw new InvalidOperationException("No ingredient selected.");
+                await _recipePlannerService.DeleteIngredientAsync(ingredientId.Value);
+                await LoadIngredientsAsync();
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private int? GetSelectedIngredientId(EntityListViewControl ingredient) {
+
+            var selected = ingredient.SelectedItem;
+
+            if (selected is not IngredientListItem item) {
+                MessageBox.Show("Er is geen ingredient geselecteerd");
+                return null;
+            }
 
             return item.Id;
         }
 
-        private async void IngredientsListView_DeleteClickedAsync(object? sender, EventArgs e) {
-            var ingredientId = GetSelectedIngredientId(sender);
-
-            await _recipePlannerService.DeleteIngredientAsync(ingredientId);
-            await LoadIngredients();
-
-
-        }
-
-        private async Task LoadIngredients() {
+        private async Task LoadIngredientsAsync() {
             var ingredients = await _recipePlannerService.GetAllIngredientsAsync();
             IngredientsListView.BindData(ingredients);
         }
@@ -75,7 +101,6 @@ namespace RecipePlanner.UI {
             if (defUnitColumn != null) {
                 defUnitColumn.HeaderText = "Eenheid";
             }
-
         }
 
 

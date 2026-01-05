@@ -36,41 +36,30 @@ namespace RecipePlanner.App {
         }
         public async Task<int> CreateIngredientAsync(
             string name,
-            int? defaultUnitId,
+            int defaultUnitId,
+            CancellationToken ct = default
+        ) {
+            name = name.Trim();
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Name is required", nameof(name));
+
+            return await _storage.AddIngredientAsync(name, defaultUnitId, ct);
+        }
+
+        public async Task UpdateIngredientAsync(
+            int id, string name,
+            int defaultUnitId,
             CancellationToken ct = default
         ) {
             name = name.Trim();
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is required.", nameof(name));
 
-            var ingredient = new Ingredient {
-                Name = name,
-                DefaultUnitId = defaultUnitId
-            };
-
-            return await _storage.AddIngredientAsync(ingredient, ct);
-        }
-
-        public async Task UpdateIngredientAsync(int id, string name, int? defaultUnitId, CancellationToken ct = default) {
-            name = name.Trim();
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name is required.", nameof(name));
-
-            //for update ingredient should exist
-            var ingredient = await _storage.GetIngredientByIdAsync(id, ct) ??
-                throw new ArgumentException("Ingredient not found.", nameof(id));
-
-            ingredient.Name = name;
-            ingredient.DefaultUnitId = defaultUnitId;
-            await _storage.UpdateIngredientAsync(ingredient, ct);
+            await _storage.UpdateIngredientAsync(id, name, defaultUnitId, ct);
         }
 
         public async Task DeleteIngredientAsync(int id, CancellationToken ct = default) {
-            //for delete ingredient should exist
-            var ingredient = await _storage.GetIngredientByIdAsync(id, ct) ??
-                throw new ArgumentException("Ingredient not found.", nameof(id));
-
-            await _storage.DeleteIngredientAsync(ingredient, ct);
+            await _storage.DeleteIngredientAsync(id, ct);
         }
 
         //***************** Recipes **********************
@@ -90,7 +79,7 @@ namespace RecipePlanner.App {
 
             return await _storage.GetAllRecipesAsync();
 
-            //todo: dit is niet goed, moet aangepast worden
+            //todo: dit is niet meer goed, moet aangepast worden, maar nu nog niet nodig
 
             //var selectedIngredientIds = allRecipes
             //    .Where(r => r.Id == recipeId)

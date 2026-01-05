@@ -41,7 +41,8 @@ namespace RecipePlanner.Data {
                 entity.HasOne(x => x.Unit)
                       .WithMany()
                       .HasForeignKey(x => x.UnitId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .IsRequired();
             });
 
             // Weekplan -> PlannedDay

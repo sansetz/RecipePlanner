@@ -5,11 +5,13 @@ using RecipePlanner.UI;
 
 namespace RecipePlanner {
     public partial class MainForm : Form {
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IRecipePlannerDbContextFactory _dbFactory;
         private readonly RecipePlannerService _recipePlannerService;
 
-        public MainForm(IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
+        public MainForm(IServiceScopeFactory scopeFactory, IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
             InitializeComponent();
+            _scopeFactory = scopeFactory;
             _dbFactory = dbFactory;
             _recipePlannerService = recipePlannerService;
 
@@ -33,13 +35,13 @@ namespace RecipePlanner {
         }
 
         private void IngredientsButton_Click(object sender, EventArgs e) {
-            using var scope = Program.ServiceProvider.CreateScope();
+            using var scope = _scopeFactory.CreateScope();
             var frm = scope.ServiceProvider.GetRequiredService<IngredientsForm>();
             frm.ShowDialog(this);
         }
 
         private void RecipesButton_Click(object sender, EventArgs e) {
-            using var scope = Program.ServiceProvider.CreateScope();
+            using var scope = _scopeFactory.CreateScope();
             var frm = scope.ServiceProvider.GetRequiredService<RecipesForm>();
             frm.ShowDialog(this);
         }

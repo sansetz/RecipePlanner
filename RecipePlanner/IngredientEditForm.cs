@@ -1,16 +1,13 @@
 ﻿using RecipePlanner.App;
-using RecipePlanner.Data;
 using RecipePlanner.Entities;
 
 namespace RecipePlanner.UI {
     public partial class IngredientEditForm : Form {
 
         private readonly RecipePlannerService _recipePlannerService;
-        //private Ingredient _ingredient = null!;
-        private int _ingredientId = -1;
+        private int? _ingredientId = null;
 
         public IngredientEditForm(
-            IRecipePlannerDbContextFactory dbFactory,
             RecipePlannerService recipePlannerService
         ) {
             InitializeComponent();
@@ -18,6 +15,7 @@ namespace RecipePlanner.UI {
         }
 
         public async Task ShowDialogForCreateAsync(IWin32Window? owner = null) {
+            _ingredientId = null;
             IngredientName.Clear();
 
             await LoadUnitsAsync();
@@ -26,27 +24,21 @@ namespace RecipePlanner.UI {
             base.ShowDialog(owner);
         }
 
-        public async Task ShowDialogForUpdateAsync(int IngredientId, IWin32Window? owner = null) {
-            if (_recipePlannerService == null)
-                throw new InvalidOperationException("RecipePlannerService is not initialized.");
+        public async Task ShowDialogForUpdateAsync(int ingredientId, IWin32Window? owner = null) {
 
-            var ingredient = await _recipePlannerService.GetIngredientByIdAsync(IngredientId);
+            var ingredient = await _recipePlannerService.GetIngredientByIdAsync(ingredientId);
 
             if (ingredient == null)
-                throw new InvalidOperationException("Ingredient to update not found");
+                throw new InvalidOperationException("Ingredient not found in DB");
 
             _ingredientId = ingredient.Id;
             IngredientName.Text = ingredient.Name;
 
             await LoadUnitsAsync();
 
-            if (ingredient.DefaultUnitId == null)
-                UnitSelector.SelectedIndex = -1;
-            else
-                UnitSelector.SelectedValue = ingredient.DefaultUnitId;
+            UnitSelector.SelectedValue = ingredient.DefaultUnitId;
 
             base.ShowDialog(owner);
-
         }
 
         private async Task LoadUnitsAsync() {
@@ -62,28 +54,57 @@ namespace RecipePlanner.UI {
         }
 
         private async void SaveIngredient_ClickAsync(object sender, EventArgs e) {
-            await SaveIngredientToDB();
-            DialogResult = DialogResult.OK;
-            this.Close();
+            try {
+                if (!ValidateForm())
+                    return;
+
+                var unitId = (int)UnitSelector.SelectedValue!; //validate already checked for null
+
+                await SaveIngredientToDB(IngredientName.Text, unitId);
+
+                DialogResult = DialogResult.OK;
+                this.Close();
+            }
+            catch (Exception ex) {
+                MessageBox.Show(
+                    ex.Message,
+                    "Fout",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
         }
 
-        private async Task SaveIngredientToDB() {
-            var unitId = UnitSelector.SelectedValue is int id ? (int?)id : null;
+        private bool ValidateForm() {
+            if (string.IsNullOrWhiteSpace(IngredientName.Text)) {
+                MessageBox.Show("Er is geen ingrediëntnaam ingevuld.", "Fout");
+                IngredientName.Focus();
+                return false;
+            }
 
-            if (_ingredientId == -1) {
+            if (UnitSelector.SelectedValue is not int) {
+                MessageBox.Show("Er is geen eenheid geselecteerd.", "Fout");
+                UnitSelector.Focus();
+                return false;
+            }
+
+            return true;
+        }
+        private async Task SaveIngredientToDB(string name, int unitId) {
+
+            if (_ingredientId == null) {
                 await _recipePlannerService.CreateIngredientAsync(
-                    IngredientName.Text,
+                    name,
                     unitId
                 );
             }
             else {
                 await _recipePlannerService.UpdateIngredientAsync(
-                    _ingredientId,
-                    IngredientName.Text,
+                    _ingredientId.Value,
+                    name,
                     unitId
                 );
             }
-
         }
 
         private void Cancel_Click(object sender, EventArgs e) {

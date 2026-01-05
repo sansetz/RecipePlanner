@@ -47,14 +47,14 @@
             label2.AutoSize = true;
             label2.Location = new Point(30, 97);
             label2.Name = "label2";
-            label2.Size = new Size(143, 32);
+            label2.Size = new Size(100, 32);
             label2.TabIndex = 2;
-            label2.Text = "Default Unit";
+            label2.Text = "Eenheid";
             // 
             // UnitSelector
             // 
             UnitSelector.FormattingEnabled = true;
-            UnitSelector.Location = new Point(206, 94);
+            UnitSelector.Location = new Point(206, 97);
             UnitSelector.Name = "UnitSelector";
             UnitSelector.Size = new Size(306, 40);
             UnitSelector.TabIndex = 3;
@@ -64,9 +64,9 @@
             label1.AutoSize = true;
             label1.Location = new Point(30, 45);
             label1.Name = "label1";
-            label1.Size = new Size(78, 32);
+            label1.Size = new Size(77, 32);
             label1.TabIndex = 0;
-            label1.Text = "Name";
+            label1.Text = "Naam";
             // 
             // IngredientName
             // 
@@ -102,7 +102,7 @@
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Name = "IngredientEditForm";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Edit Ingredient";
+            Text = "Bewerk ingredient";
             ResumeLayout(false);
             PerformLayout();
         }

@@ -5,7 +5,6 @@ using RecipePlanner.UI;
 
 namespace RecipePlanner {
     internal static class Program {
-        public static IServiceProvider ServiceProvider { get; private set; } = default!;
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -16,13 +15,14 @@ namespace RecipePlanner {
             var services = new ServiceCollection();
             services.AddRecipePlannerInfraCore();
             services.AddRecipePlannerApplicationCore();
+
             services.AddTransient<MainForm>();
             services.AddTransient<IngredientsForm>();
             services.AddTransient<RecipesForm>();
             services.AddTransient<IngredientEditForm>();
 
-            ServiceProvider = services.BuildServiceProvider();
-            var mainForm = ServiceProvider.GetRequiredService<MainForm>();
+            using var serviceProvider = services.BuildServiceProvider();
+            var mainForm = serviceProvider.GetRequiredService<MainForm>();
             Application.Run(mainForm);
 
 

@@ -9,9 +9,9 @@ namespace RecipePlanner.Data {
 
         Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default);
         Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default);
-        Task<int> AddIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
-        Task UpdateIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
-        Task DeleteIngredientAsync(Ingredient ingredient, CancellationToken ct = default);
+        Task<int> AddIngredientAsync(string name, int defaultUnitId, CancellationToken ct = default);
+        Task UpdateIngredientAsync(int id, string name, int defaultUnitId, CancellationToken ct = default);
+        Task DeleteIngredientAsync(int id, CancellationToken ct = default);
 
         Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
 
@@ -31,8 +31,9 @@ namespace RecipePlanner.Data {
             using var db = _factory.CreateDbContext();
 
             return await db.Units
+                .AsNoTracking()
                 .OrderBy(u => u.Name)
-                .ToListAsync();
+                .ToListAsync(ct);
         }
 
 
@@ -41,36 +42,55 @@ namespace RecipePlanner.Data {
             using var db = _factory.CreateDbContext();
 
             return await db.Ingredients
+                .AsNoTracking()
                 .OrderBy(i => i.Name)
                 .Select(i => new IngredientListItem(
                     i.Id,
                     i.Name,
                     i.DefaultUnit != null ? i.DefaultUnit.Name : null
                 ))
-                .ToListAsync();
+                .ToListAsync(ct);
         }
 
         public async Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default) {
             using var db = _factory.CreateDbContext();
 
             return await db.Ingredients
+                .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id, ct);
         }
 
-        public async Task<int> AddIngredientAsync(Ingredient ingredient, CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
+        public async Task<int> AddIngredientAsync(string name, int defaultUnitId, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            var ingredient = new Ingredient { Name = name, DefaultUnitId = defaultUnitId };
             db.Ingredients.Add(ingredient);
             await db.SaveChangesAsync(ct);
+
             return ingredient.Id;
         }
-        public async Task UpdateIngredientAsync(Ingredient ingredient, CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
-            db.Ingredients.Update(ingredient);
+        public async Task UpdateIngredientAsync(int id, string name, int defaultUnitId, CancellationToken ct = default) {
+
+            await using var db = _factory.CreateDbContext();
+
+            var ingredient = await db.Ingredients.FindAsync([id], ct);
+            if (ingredient is null)
+                throw new InvalidOperationException("Ingrediënt bestaat niet (meer).");
+
+            ingredient.Name = name;
+            ingredient.DefaultUnitId = defaultUnitId;
+
             await db.SaveChangesAsync(ct);
         }
-        public async Task DeleteIngredientAsync(Ingredient ingredient, CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
+        public async Task DeleteIngredientAsync(int id, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            var ingredient = await db.Ingredients.FindAsync([id], ct);
+            if (ingredient is null)
+                throw new InvalidOperationException("Ingrediënt bestaat niet (meer).");
+
             db.Ingredients.Remove(ingredient);
+
             await db.SaveChangesAsync(ct);
         }
 
@@ -79,6 +99,7 @@ namespace RecipePlanner.Data {
             using var db = _factory.CreateDbContext();
 
             return await db.Recipes
+                .AsNoTracking()
                 .OrderBy(r => r.Name)
                 .Select(r => new RecipeListItem(
                     r.Id,

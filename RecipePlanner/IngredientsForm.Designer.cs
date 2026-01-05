@@ -49,7 +49,6 @@
         }
 
         #endregion
-        private TextBox textBox2;
         private EntityListViewControl IngredientsListView;
     }
 }
