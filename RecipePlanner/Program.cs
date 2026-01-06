@@ -12,7 +12,7 @@ namespace RecipePlanner {
         static void Main() {
             // TODO's:
             // - Add boolean field to ingredient for marking if it should be used for finding overlap recipes
-
+            // - Add close button to EntityListViewControl that closed the parent form
 
             ApplicationConfiguration.Initialize();
 
@@ -25,6 +25,7 @@ namespace RecipePlanner {
             services.AddTransient<RecipesForm>();
             services.AddTransient<IngredientEditForm>();
             services.AddTransient<RecipeEditForm>();
+            services.AddTransient<RecipeIngredientEditForm>();
 
             using var serviceProvider = services.BuildServiceProvider();
             var mainForm = serviceProvider.GetRequiredService<MainForm>();

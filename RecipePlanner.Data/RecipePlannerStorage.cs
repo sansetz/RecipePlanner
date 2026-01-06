@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipePlanner.Contracts.Ingredient;
 using RecipePlanner.Contracts.Recipe;
+using RecipePlanner.Contracts.RecipeIngredient;
 using RecipePlanner.Entities;
 
 namespace RecipePlanner.Data {
@@ -18,6 +19,13 @@ namespace RecipePlanner.Data {
         Task<int> AddRecipeAsync(string name, PrepTime preptime, CancellationToken ct = default);
         Task UpdateRecipeAsync(int id, string name, PrepTime preptime, CancellationToken ct = default);
         Task DeleteRecipeAsync(int id, CancellationToken ct = default);
+
+
+        Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId, CancellationToken ct = default);
+        Task<int> AddRecipeIngredientAsync(int recipeId, int ingredientId, int unitId, decimal quantity, CancellationToken ct = default);
+        Task UpdateRecipeIngredientAsync(int recipeId, int oldIngredientId, int newIngredientId, int unitId, decimal quantity, CancellationToken ct = default);
+        Task DeleteRecipeIngredientAsync(int recipeId, int ingredientId, CancellationToken ct = default);
+
 
         Task SaveSeedDataAsync(CancellationToken ct = default);
 
@@ -151,6 +159,105 @@ namespace RecipePlanner.Data {
 
             db.Recipes.Remove(recipe);
 
+            await db.SaveChangesAsync(ct);
+        }
+
+        // ***************** RecipeIngredients *****************
+        public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId, CancellationToken ct = default) {
+            using var db = _factory.CreateDbContext();
+
+
+            return await db.RecipeIngredients
+                            .AsNoTracking()
+                            .Where(ri => ri.RecipeId == recipeId)
+                            .OrderBy(ri => ri.Ingredient.Name)
+                            .Select(ri => new RecipeIngredientListItem(
+                                ri.IngredientId,
+                                ri.Ingredient.Name,
+                                ri.IngredientId, //load from DB so oldIngredientId is the same as IngredientId
+                                ri.UnitId,
+                                ri.Unit.Name,
+                                ri.NumberOfUnits
+                            ))
+                            .ToListAsync(ct);
+
+
+
+        }
+
+        public async Task<int> AddRecipeIngredientAsync(
+            int recipeId,
+            int ingredientId,
+            int unitId,
+            decimal quantity,
+            CancellationToken ct = default
+        ) {
+            await using var db = _factory.CreateDbContext();
+
+            var recipeIngredient = new RecipeIngredient {
+                RecipeId = recipeId,
+                IngredientId = ingredientId,
+                UnitId = unitId,
+                NumberOfUnits = quantity
+            };
+
+            db.RecipeIngredients.Add(recipeIngredient);
+            await db.SaveChangesAsync(ct);
+
+            return recipeIngredient.IngredientId;
+
+        }
+        public async Task UpdateRecipeIngredientAsync(
+            int recipeId,
+            int oldIngredientId,
+            int newIngredientId,
+            int unitId,
+            decimal quantity,
+            CancellationToken ct = default
+        ) {
+            await using var db = _factory.CreateDbContext();
+
+            var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeId, oldIngredientId], ct);
+            if (recipeIngredient is null)
+                throw new InvalidOperationException("RecipeIngredient not available in DB");
+
+            if (oldIngredientId == newIngredientId) {
+                recipeIngredient.UnitId = unitId;
+                recipeIngredient.NumberOfUnits = quantity;
+                await db.SaveChangesAsync(ct);
+                return;
+            }
+
+            // Verwijder oude koppeling
+            db.RecipeIngredients.Remove(recipeIngredient);
+
+            //check of new koppeling al bestaat
+            var existingLink = await db.RecipeIngredients.FindAsync([recipeId, newIngredientId], ct);
+            if (existingLink != null) {
+                recipeIngredient.UnitId = unitId;
+                recipeIngredient.NumberOfUnits = quantity;
+                await db.SaveChangesAsync(ct);
+                return;
+            }
+
+            // Voeg nieuwe koppeling toe
+            recipeIngredient.RecipeId = recipeId;
+            recipeIngredient.IngredientId = newIngredientId;
+            recipeIngredient.UnitId = unitId;
+            recipeIngredient.NumberOfUnits = quantity;
+            db.RecipeIngredients.Add(recipeIngredient);
+            await db.SaveChangesAsync(ct);
+        }
+
+        public async Task DeleteRecipeIngredientAsync(int recipeId, int ingredientId, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeId, ingredientId], ct);
+            if (recipeIngredient is null)
+                throw new InvalidOperationException("RecipeIngredient not available in DB");
+
+            // Verwijder oude koppeling
+            db.RecipeIngredients.Remove(recipeIngredient);
             await db.SaveChangesAsync(ct);
         }
 

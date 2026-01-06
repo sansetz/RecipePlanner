@@ -49,7 +49,7 @@
             DeleteItem.Name = "DeleteItem";
             DeleteItem.Size = new Size(236, 57);
             DeleteItem.TabIndex = 14;
-            DeleteItem.Text = "Delete";
+            DeleteItem.Text = "Verwijderen";
             DeleteItem.UseVisualStyleBackColor = true;
             DeleteItem.Click += DeleteItem_Click;
             // 
@@ -59,7 +59,7 @@
             UpdateItem.Name = "UpdateItem";
             UpdateItem.Size = new Size(236, 57);
             UpdateItem.TabIndex = 13;
-            UpdateItem.Text = "Bewerk";
+            UpdateItem.Text = "Aanpassen";
             UpdateItem.UseVisualStyleBackColor = true;
             UpdateItem.Click += UpdateItem_Click;
             // 
@@ -69,7 +69,7 @@
             AddItem.Name = "AddItem";
             AddItem.Size = new Size(236, 57);
             AddItem.TabIndex = 12;
-            AddItem.Text = "Nieuw";
+            AddItem.Text = "Toevoegen";
             AddItem.UseVisualStyleBackColor = true;
             AddItem.Click += AddItem_Click;
             // 
