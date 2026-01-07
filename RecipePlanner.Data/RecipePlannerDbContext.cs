@@ -28,21 +28,26 @@ namespace RecipePlanner.Data {
 
             // RecipeIngredient (join entity met extra velden)
             modelBuilder.Entity<RecipeIngredient>(entity => {
-                entity.HasKey(x => new { x.RecipeId, x.IngredientId });
 
-                entity.HasOne(x => x.Recipe)
-                      .WithMany(r => r.RecipeIngredients)
-                      .HasForeignKey(x => x.RecipeId);
+                entity.HasKey(x => x.Id);
 
                 entity.HasOne(x => x.Ingredient)
                       .WithMany(i => i.RecipeIngredients)
-                      .HasForeignKey(x => x.IngredientId);
+                      .HasForeignKey(x => x.IngredientId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.Recipe)
+                      .WithMany(r => r.RecipeIngredients)
+                      .HasForeignKey(x => x.RecipeId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(x => x.Unit)
                       .WithMany()
                       .HasForeignKey(x => x.UnitId)
-                      .OnDelete(DeleteBehavior.Restrict)
-                      .IsRequired();
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new { x.RecipeId, x.IngredientId })
+                      .IsUnique();
             });
 
             // Weekplan -> PlannedDay

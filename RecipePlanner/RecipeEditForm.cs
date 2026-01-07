@@ -7,8 +7,9 @@ namespace RecipePlanner.UI {
     public partial class RecipeEditForm : Form {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly RecipePlannerService _recipePlannerService;
+
         private int? _recipeId = null;
-        private List<RecipeIngredientListItem>? _recipeIngredients;
+        private List<RecipeIngredientEditItem>? _recipeIngredients;
 
         public RecipeEditForm(
             IServiceScopeFactory scopeFactory,
@@ -20,10 +21,9 @@ namespace RecipePlanner.UI {
         }
 
         private void RecipeEditForm_Load(object sender, EventArgs e) {
-
             IngredientsListView.AddClicked += IngredientsListView_AddClickedAsync;
             IngredientsListView.UpdateClicked += IngredientsListView_UpdateClickedAsync;
-            IngredientsListView.DeleteClicked += IngredientsListView_DeleteClickedAsync;
+            IngredientsListView.DeleteClicked += IngredientsListView_DeleteClicked;
 
         }
 
@@ -35,8 +35,10 @@ namespace RecipePlanner.UI {
             PrepTimeSelector.SelectedIndex = -1;
 
             this.Text = "Nieuw recept aanmaken";
+            IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
 
-            _recipeIngredients = new List<RecipeIngredientListItem>();
+
+            _recipeIngredients = new List<RecipeIngredientEditItem>();
 
             base.ShowDialog(owner);
         }
@@ -105,47 +107,60 @@ namespace RecipePlanner.UI {
 
             return true;
         }
-        private async Task SaveRecipeToDB(string name, PrepTime preptime) {
-            if (_recipeId == null) {
-                _recipeId = await _recipePlannerService.CreateRecipeAsync(
-                    name,
-                    preptime
-                );
 
+
+
+
+        private async Task SaveRecipeToDB(string name, PrepTime preptime) {
+            // 1) Recipe zelf opslaan
+            if (_recipeId == null) {
+                _recipeId = await _recipePlannerService.CreateRecipeAsync(name, preptime);
             }
             else {
-                await _recipePlannerService.UpdateRecipeAsync(
+                await _recipePlannerService.UpdateRecipeAsync(_recipeId.Value, name, preptime);
+            }
+
+            // 2) Ingredients syncen
+            if (_recipeIngredients == null)
+                throw new InvalidOperationException("Recipe ingredients list is null.");
+
+            // Deleted eerst (voorkomt unique conflicts bij ingredient switch)
+            foreach (var item in _recipeIngredients.Where(x => x.State == EditState.Deleted)) {
+                if (item.RecipeIngredientId != null) {
+                    await _recipePlannerService.DeleteRecipeIngredientAsync(item.RecipeIngredientId.Value);
+                }
+            }
+
+            // Added
+            foreach (var item in _recipeIngredients.Where(x => x.State == EditState.Added)) {
+                var newId = await _recipePlannerService.CreateRecipeIngredientAsync(
                     _recipeId.Value,
-                    name,
-                    preptime
-                );
+                    item.IngredientId,
+                    item.UnitId,
+                    item.Quantity);
+
+                item.RecipeIngredientId = newId;
+                item.State = EditState.Unchanged;
             }
 
-            foreach (var ingredient in _recipeIngredients!) {
-                if (ingredient.OldIngredientId != null) {
-                    //ingredient is updated
-                    await _recipePlannerService.UpdateRecipeIngredientAsync(
-                        _recipeId.Value,
-                        ingredient.OldIngredientId.Value,
-                        ingredient.IngredientId,
-                        ingredient.UnitId,
-                        ingredient.Quantity
-                    );
-                }
-                else {
-                    //new ingredient
-                    await _recipePlannerService.CreateRecipeIngredientAsync(
-                        _recipeId.Value,
-                        ingredient.IngredientId,
-                        ingredient.UnitId,
-                        ingredient.Quantity
-                    );
-                }
+            // Modified
+            foreach (var item in _recipeIngredients.Where(x => x.State == EditState.Modified)) {
+                if (item.RecipeIngredientId == null)
+                    throw new InvalidOperationException("Modified item without RecipeIngredientId.");
+
+                await _recipePlannerService.UpdateRecipeIngredientAsync(
+                    item.RecipeIngredientId.Value,
+                    item.IngredientId,
+                    item.UnitId,
+                    item.Quantity);
+
+                item.State = EditState.Unchanged;
             }
 
-
-
+            // Optioneel: verwijder deleted items uit de lijst na succesvolle save
+            _recipeIngredients.RemoveAll(x => x.State == EditState.Deleted);
         }
+
         private void Cancel_Click(object sender, EventArgs e) {
             DialogResult = DialogResult.Cancel;
             this.Close();
@@ -161,6 +176,9 @@ namespace RecipePlanner.UI {
 
                 await frm.ShowDialogForCreateAsync(_recipeIngredients, this);
 
+                if (frm.DialogResult != DialogResult.OK)
+                    return;
+
                 BindRecipeIngredients();
             }
             catch (Exception ex) {
@@ -173,65 +191,76 @@ namespace RecipePlanner.UI {
                 if (sender is not EntityListViewControl list)
                     throw new InvalidOperationException("Event sender is not EntityListViewControl.");
 
-                if (_recipeId == null)
-                    throw new InvalidOperationException("Recipe ID is null.");
-
-                if (_recipeIngredients == null)
-                    throw new InvalidOperationException("Recipe ingredients list is null.");
-
-                var ingredientId = GetSelectedIngredientId(list);
-                if (ingredientId == null)
+                var uiId = GetSelectedRecipeIngredientUiId(list);
+                if (uiId == null)
                     return;
 
                 using var scope = _scopeFactory.CreateScope();
                 var frm = scope.ServiceProvider.GetRequiredService<RecipeIngredientEditForm>();
-                await frm.ShowDialogForUpdateAsync(_recipeIngredients, ingredientId.Value, this);
+                await frm.ShowDialogForUpdateAsync(_recipeIngredients!, uiId.Value, this);
 
-                BindRecipeIngredients();
-
-            }
-            catch (Exception ex) {
-                MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private async void IngredientsListView_DeleteClickedAsync(object? sender, EventArgs e) {
-            try {
-                if (sender is not EntityListViewControl list) {
-                    throw new InvalidOperationException("Event sender is not EntityListViewControl.");
-                }
-                if (_recipeId == null)
-                    throw new InvalidOperationException("Recipe ID is null.");
-
-                var ingredientId = GetSelectedIngredientId(list);
-                if (ingredientId == null)
+                if (frm.DialogResult != DialogResult.OK)
                     return;
 
-                await _recipePlannerService.DeleteRecipeIngredientAsync(_recipeId.Value, ingredientId.Value);
+                BindRecipeIngredients();
             }
             catch (Exception ex) {
                 MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private int? GetSelectedIngredientId(EntityListViewControl recipeingredient) {
+        private void IngredientsListView_DeleteClicked(object? sender, EventArgs e) {
+            try {
+                if (sender is not EntityListViewControl list)
+                    throw new InvalidOperationException("Event sender is not EntityListViewControl.");
 
-            var selected = recipeingredient.SelectedItem;
+                var uiId = GetSelectedRecipeIngredientUiId(list);
+                if (uiId == null)
+                    return;
 
-            if (selected is not RecipeIngredientListItem item) {
+                var item = _recipeIngredients!.First(x => x.UiId == uiId.Value);
+
+                if (item.State == EditState.Added) {
+                    _recipeIngredients!.Remove(item);
+                }
+                else {
+                    item.State = EditState.Deleted;
+                }
+
+                BindRecipeIngredients();
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private Guid? GetSelectedRecipeIngredientUiId(EntityListViewControl list) {
+            if (list.SelectedItem is not RecipeIngredientGridRow row) {
                 MessageBox.Show("Er is geen ingredient geselecteerd");
                 return null;
             }
 
-            return item.IngredientId;
+            return row.UiId;
         }
 
-        private async Task LoadRecipeIngredientsAsync() {
-            _recipeIngredients = new List<RecipeIngredientListItem>();
 
+        private async Task LoadRecipeIngredientsAsync() {
             if (_recipeId == null)
                 throw new InvalidOperationException("Recipe ID is null.");
-            _recipeIngredients = await _recipePlannerService.GetAllRecipeIngredientsAsync(_recipeId.Value);
+
+            var rows = await _recipePlannerService.GetAllRecipeIngredientsAsync(_recipeId.Value);
+
+            _recipeIngredients = rows.Select(r => new RecipeIngredientEditItem {
+                RecipeIngredientId = r.RecipeIngredientId,
+                IngredientId = r.IngredientId,
+                IngredientName = r.IngredientName,
+                UnitId = r.UnitId,
+                UnitName = r.UnitName,
+                Quantity = r.Quantity,
+                State = EditState.Unchanged
+            }).ToList();
+
+
 
             BindRecipeIngredients();
         }
@@ -242,22 +271,28 @@ namespace RecipePlanner.UI {
             if (_recipeIngredients == null)
                 throw new InvalidOperationException("Recipe ingredients list is null.");
 
-            var recipeIngredients = _recipeIngredients.ToList();
-            IngredientsListView.BindData(recipeIngredients);
+            var view = _recipeIngredients
+                .Where(x => x.State != EditState.Deleted)
+                .Select(x => new RecipeIngredientGridRow {
+                    UiId = x.UiId,
+                    IngredientName = x.IngredientName,
+                    UnitName = x.UnitName,
+                    Quantity = x.Quantity
+                })
+                .ToList();
+
+            IngredientsListView.BindData(view);
         }
 
         private void ExtraGridConfig(DataGridView grid) {
-            var idColumn = grid.Columns["OldIngredientId"];
-            if (idColumn != null)
-                idColumn.Visible = false;
 
-            var unitIdColumn = grid.Columns["UnitId"];
-            if (unitIdColumn != null)
-                unitIdColumn.Visible = false;
+            //hide columns
 
-            var ingredientIdColumn = grid.Columns["IngredientId"];
-            if (ingredientIdColumn != null)
-                ingredientIdColumn.Visible = false;
+            var uiIdColumn = grid.Columns["UiId"];
+            if (uiIdColumn != null)
+                uiIdColumn.Visible = false;
+
+            //other column configs
 
             var nameColumn = grid.Columns["IngredientName"];
             if (nameColumn != null) {

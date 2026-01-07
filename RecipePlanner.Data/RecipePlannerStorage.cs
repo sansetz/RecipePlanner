@@ -23,8 +23,8 @@ namespace RecipePlanner.Data {
 
         Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId, CancellationToken ct = default);
         Task<int> AddRecipeIngredientAsync(int recipeId, int ingredientId, int unitId, decimal quantity, CancellationToken ct = default);
-        Task UpdateRecipeIngredientAsync(int recipeId, int oldIngredientId, int newIngredientId, int unitId, decimal quantity, CancellationToken ct = default);
-        Task DeleteRecipeIngredientAsync(int recipeId, int ingredientId, CancellationToken ct = default);
+        Task UpdateRecipeIngredientAsync(int recipeIngredientId, int ingredientId, int unitId, decimal quantity, CancellationToken ct = default);
+        Task DeleteRecipeIngredientAsync(int recipeIngredientId, CancellationToken ct = default);
 
 
         Task SaveSeedDataAsync(CancellationToken ct = default);
@@ -163,26 +163,26 @@ namespace RecipePlanner.Data {
         }
 
         // ***************** RecipeIngredients *****************
-        public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId, CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
 
+        public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(
+            int recipeId,
+            CancellationToken ct = default
+        ) {
+            await using var db = _factory.CreateDbContext();
 
             return await db.RecipeIngredients
-                            .AsNoTracking()
-                            .Where(ri => ri.RecipeId == recipeId)
-                            .OrderBy(ri => ri.Ingredient.Name)
-                            .Select(ri => new RecipeIngredientListItem(
-                                ri.IngredientId,
-                                ri.Ingredient.Name,
-                                ri.IngredientId, //load from DB so oldIngredientId is the same as IngredientId
-                                ri.UnitId,
-                                ri.Unit.Name,
-                                ri.NumberOfUnits
-                            ))
-                            .ToListAsync(ct);
-
-
-
+                .AsNoTracking()
+                .Where(ri => ri.RecipeId == recipeId)
+                .OrderBy(ri => ri.Ingredient.Name)
+                .Select(ri => new RecipeIngredientListItem(
+                    ri.Id,
+                    ri.IngredientId,
+                    ri.Ingredient.Name,
+                    ri.UnitId,
+                    ri.Unit.Name,
+                    ri.Quantity
+                ))
+                .ToListAsync(ct);
         }
 
         public async Task<int> AddRecipeIngredientAsync(
@@ -198,65 +198,40 @@ namespace RecipePlanner.Data {
                 RecipeId = recipeId,
                 IngredientId = ingredientId,
                 UnitId = unitId,
-                NumberOfUnits = quantity
+                Quantity = quantity
             };
 
             db.RecipeIngredients.Add(recipeIngredient);
             await db.SaveChangesAsync(ct);
 
-            return recipeIngredient.IngredientId;
-
+            return recipeIngredient.Id;
         }
         public async Task UpdateRecipeIngredientAsync(
-            int recipeId,
-            int oldIngredientId,
-            int newIngredientId,
+            int recipeIngredientId,
+            int ingredientId,
             int unitId,
             decimal quantity,
-            CancellationToken ct = default
-        ) {
+            CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
-            var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeId, oldIngredientId], ct);
+            var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeIngredientId], ct);
             if (recipeIngredient is null)
                 throw new InvalidOperationException("RecipeIngredient not available in DB");
 
-            if (oldIngredientId == newIngredientId) {
-                recipeIngredient.UnitId = unitId;
-                recipeIngredient.NumberOfUnits = quantity;
-                await db.SaveChangesAsync(ct);
-                return;
-            }
-
-            // Verwijder oude koppeling
-            db.RecipeIngredients.Remove(recipeIngredient);
-
-            //check of new koppeling al bestaat
-            var existingLink = await db.RecipeIngredients.FindAsync([recipeId, newIngredientId], ct);
-            if (existingLink != null) {
-                recipeIngredient.UnitId = unitId;
-                recipeIngredient.NumberOfUnits = quantity;
-                await db.SaveChangesAsync(ct);
-                return;
-            }
-
-            // Voeg nieuwe koppeling toe
-            recipeIngredient.RecipeId = recipeId;
-            recipeIngredient.IngredientId = newIngredientId;
+            recipeIngredient.IngredientId = ingredientId;
             recipeIngredient.UnitId = unitId;
-            recipeIngredient.NumberOfUnits = quantity;
-            db.RecipeIngredients.Add(recipeIngredient);
+            recipeIngredient.Quantity = quantity;
+
             await db.SaveChangesAsync(ct);
         }
 
-        public async Task DeleteRecipeIngredientAsync(int recipeId, int ingredientId, CancellationToken ct = default) {
+        public async Task DeleteRecipeIngredientAsync(int recipeIngredientId, CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
-            var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeId, ingredientId], ct);
+            var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeIngredientId], ct);
             if (recipeIngredient is null)
                 throw new InvalidOperationException("RecipeIngredient not available in DB");
 
-            // Verwijder oude koppeling
             db.RecipeIngredients.Remove(recipeIngredient);
             await db.SaveChangesAsync(ct);
         }
@@ -297,25 +272,25 @@ namespace RecipePlanner.Data {
                     RecipeId = r1.Id,
                     IngredientId = broccoli.Id,
                     UnitId = gram.Id,
-                    NumberOfUnits = 300 // of 300m als decimal
+                    Quantity = 300 // of 300m als decimal
                 },
                 new RecipeIngredient {
                     RecipeId = r1.Id,
                     IngredientId = rijst.Id,
                     UnitId = gram.Id,
-                    NumberOfUnits = 200
+                    Quantity = 200
                 },
                 new RecipeIngredient {
                     RecipeId = r2.Id,
                     IngredientId = rijst.Id,
                     UnitId = gram.Id,
-                    NumberOfUnits = 200
+                    Quantity = 200
                 },
                 new RecipeIngredient {
                     RecipeId = r2.Id,
                     IngredientId = ui.Id,
                     UnitId = stuk.Id,
-                    NumberOfUnits = 1
+                    Quantity = 1
                 }
             );
 

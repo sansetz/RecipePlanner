@@ -45,16 +45,29 @@
 
         private void DataSpecificConfigGrid() {
 
-            if (ListItemsGrid.Rows.Count > 0) {
-                var firstRow = ListItemsGrid.Rows[0];
-                firstRow.Selected = true;
-                ListItemsGrid.CurrentCell = firstRow.Cells[1];
-                ListItemsGrid.Enabled = true;
-            }
+            ListItemsGrid.Enabled = true;
 
             var idColumn = ListItemsGrid.Columns["Id"];
             if (idColumn != null)
                 idColumn.Visible = false;
+
+            if (ListItemsGrid.Rows.Count > 0) {
+                var firstRow = ListItemsGrid.Rows[0];
+
+                // find first visible column
+                DataGridViewColumn? firstVisibleCol = null;
+                foreach (DataGridViewColumn col in ListItemsGrid.Columns) {
+                    if (col.Visible) {
+                        firstVisibleCol = col;
+                        break;
+                    }
+                }
+
+                if (firstVisibleCol != null) {
+                    ListItemsGrid.CurrentCell = firstRow.Cells[firstVisibleCol.Index];
+                    firstRow.Selected = true;
+                }
+            }
         }
 
         private void UpdateButtonsState() {

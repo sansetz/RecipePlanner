@@ -76,9 +76,9 @@ namespace RecipePlanner.UI {
                 MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private int? GetSelectedRecipeId(EntityListViewControl recipe) {
+        private int? GetSelectedRecipeId(EntityListViewControl list) {
 
-            var selected = recipe.SelectedItem;
+            var selected = list.SelectedItem;
 
             if (selected is not RecipeListItem item) {
                 MessageBox.Show("Er is geen recept geselecteerd");

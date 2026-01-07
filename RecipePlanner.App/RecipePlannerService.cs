@@ -129,17 +129,9 @@ namespace RecipePlanner.App {
         }
 
         //***************** Recipe Ingredients *************
-        public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId) {
-            var rows = await _storage.GetAllRecipeIngredientsAsync(recipeId);
 
-            return rows.Select(r => new RecipeIngredientListItem(
-                r.IngredientId,
-                r.IngredientName,
-                r.IngredientId, //load from DB so oldIngredientId is same as IngredientId
-                r.UnitId,
-                r.UnitName,
-                r.Quantity
-            )).ToList();
+        public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId) {
+            return await _storage.GetAllRecipeIngredientsAsync(recipeId);
         }
 
         public async Task<int> CreateRecipeIngredientAsync(
@@ -149,35 +141,37 @@ namespace RecipePlanner.App {
             decimal quantity,
             CancellationToken ct = default
         ) {
-            return await _storage.AddRecipeIngredientAsync(recipeId, ingredientId, unitId, quantity, ct);
+            return await _storage.AddRecipeIngredientAsync(
+                recipeId,
+                ingredientId,
+                unitId,
+                quantity,
+                ct
+            );
         }
 
         public async Task UpdateRecipeIngredientAsync(
-            int recipeId,
-            int oldingredientId,
-            int newingredientId,
+            int recipeIngredientId,
+            int ingredientId,
             int unitId,
             decimal quantity,
             CancellationToken ct = default
         ) {
             await _storage.UpdateRecipeIngredientAsync(
-                recipeId,
-                oldingredientId,
-                newingredientId,
+                recipeIngredientId,
+                ingredientId,
                 unitId,
                 quantity,
                 ct
-             );
+            );
         }
 
         public async Task DeleteRecipeIngredientAsync(
-            int recipeId,
-            int ingredientId,
+            int recipeIngredientId,
             CancellationToken ct = default
         ) {
-            await _storage.DeleteRecipeIngredientAsync(recipeId, ingredientId, ct);
+            await _storage.DeleteRecipeIngredientAsync(recipeIngredientId, ct);
         }
-
 
         //***************** Seed Data **********************
         public async Task SaveSeedDataAsync() {

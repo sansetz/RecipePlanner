@@ -13,9 +13,9 @@ namespace RecipePlanner.UI {
             _recipePlannerService = recipePlannerService;
         }
         private async void IngredientsForm_LoadAsync(object sender, EventArgs e) {
+            IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
             await LoadIngredientsAsync();
 
-            IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
 
             IngredientsListView.AddClicked += IngredientsListView_AddClickedAsync;
             IngredientsListView.UpdateClicked += IngredientsListView_UpdateClickedAsync;
@@ -73,9 +73,9 @@ namespace RecipePlanner.UI {
                 MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private int? GetSelectedIngredientId(EntityListViewControl ingredient) {
+        private int? GetSelectedIngredientId(EntityListViewControl list) {
 
-            var selected = ingredient.SelectedItem;
+            var selected = list.SelectedItem;
 
             if (selected is not IngredientListItem item) {
                 MessageBox.Show("Er is geen ingredient geselecteerd");

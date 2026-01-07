@@ -5,9 +5,10 @@ using RecipePlanner.Entities;
 
 namespace RecipePlanner.UI {
     public partial class RecipeIngredientEditForm : Form {
+
         private readonly RecipePlannerService _recipePlannerService;
-        private List<RecipeIngredientListItem>? _recipeIngredients;
-        private int? _ingredientId = null;
+        private List<RecipeIngredientEditItem>? _recipeIngredients;
+        private Guid? _uiId = null; // null = create, value = update
 
         public RecipeIngredientEditForm(
             RecipePlannerService recipePlannerService
@@ -17,33 +18,44 @@ namespace RecipePlanner.UI {
         }
 
         //adds new ingredient to the list of ingredients
-        public async Task ShowDialogForCreateAsync(List<RecipeIngredientListItem> recipeIngredients, IWin32Window? owner = null) {
+        public async Task ShowDialogForCreateAsync(
+            List<RecipeIngredientEditItem> recipeIngredients,
+            IWin32Window? owner = null
+        ) {
             _recipeIngredients = recipeIngredients;
-            _ingredientId = null;
+            _uiId = null;
 
-            this.Text = "Nieuw ingredient aan recept toevoegen";
+            Text = "Nieuw ingredient aan recept toevoegen";
+
             await LoadIngredientAsync();
             await LoadUnitsAsync();
+
             IngredientSelector.SelectedIndex = -1;
             UnitSelector.SelectedIndex = -1;
+            Quantity.Text = "";
 
             base.ShowDialog(owner);
-
         }
 
         //updates ingredient with IngredientId in the list of ingredients (replaces
-        public async Task ShowDialogForUpdateAsync(List<RecipeIngredientListItem> recipeIngredients, int ingredientId, IWin32Window? owner = null) {
-
+        public async Task ShowDialogForUpdateAsync(
+            List<RecipeIngredientEditItem> recipeIngredients,
+            Guid uiId,
+            IWin32Window? owner = null
+        ) {
             _recipeIngredients = recipeIngredients;
-            _ingredientId = ingredientId;
+            _uiId = uiId;
 
-            this.Text = "Ingredient van recept bewerken";
+            Text = "Ingredient van recept bewerken";
+
             await LoadIngredientAsync();
             await LoadUnitsAsync();
 
-            IngredientSelector.SelectedValue = ingredientId;
+            var item = _recipeIngredients.First(x => x.UiId == uiId);
 
-
+            IngredientSelector.SelectedValue = item.IngredientId;
+            UnitSelector.SelectedValue = item.UnitId;
+            Quantity.Text = item.Quantity.ToString();
 
             base.ShowDialog(owner);
         }
@@ -53,51 +65,51 @@ namespace RecipePlanner.UI {
                 if (_recipeIngredients == null)
                     throw new InvalidOperationException("Recipe ingredients list is null.");
 
+                if (!ValidateForm())
+                    return;
 
-                if (ValidateForm()) {
-                    var ingredientId = (int)IngredientSelector.SelectedValue!; //validate already checked for null
-                    var ingredientName = (IngredientSelector.SelectedItem as IngredientListItem)?.Name ?? "";
-                    var unitId = (int)UnitSelector.SelectedValue!; //validate already checked for null
-                    var unitName = (UnitSelector.SelectedItem as Unit)?.Name ?? "";
-                    var quantity = decimal.Parse(Quantity.Text); //validate already checked for null and integer
+                var ingredientId = (int)IngredientSelector.SelectedValue!;
+                var ingredientName = (IngredientSelector.SelectedItem as IngredientListItem)?.Name ?? "";
+                var unitId = (int)UnitSelector.SelectedValue!;
+                var unitName = (UnitSelector.SelectedItem as Unit)?.Name ?? "";
 
-                    if (_ingredientId == null) {
-                        _recipeIngredients.Add(
-                            new RecipeIngredientListItem(
-                                ingredientId,
-                                ingredientName,
-                                null,
-                                unitId,
-                                unitName,
-                                quantity
-                            )
-                        );
-                    }
-                    else {
-                        var recipeIngredient = _recipeIngredients.FirstOrDefault(
-                            x => x.IngredientId == _ingredientId
-                        ) ?? throw new InvalidOperationException("Recipe ingredient to edit not found in the list.");
-
-                        //remember old ingredient id only for first update
-                        if (recipeIngredient.OldIngredientId == null)
-                            recipeIngredient.OldIngredientId = recipeIngredient.IngredientId;
-
-                        recipeIngredient.IngredientId = ingredientId;
-                        recipeIngredient.UnitId = unitId;
-                        recipeIngredient.Quantity = quantity;
-                    }
-
-                    DialogResult = DialogResult.OK;
-                    this.Close();
+                if (!decimal.TryParse(Quantity.Text, out var quantity)) {
+                    MessageBox.Show("Aantal is geen geldig getal.", "Fout");
+                    Quantity.Focus();
+                    return;
                 }
+
+                if (_uiId == null) {
+                    // CREATE -> add new edit item
+                    _recipeIngredients.Add(new RecipeIngredientEditItem {
+                        RecipeIngredientId = null,
+                        IngredientId = ingredientId,
+                        IngredientName = ingredientName,
+                        UnitId = unitId,
+                        UnitName = unitName,
+                        Quantity = quantity,
+                        State = EditState.Added
+                    });
+                }
+                else {
+                    // UPDATE -> find by UiId and update
+                    var item = _recipeIngredients.First(x => x.UiId == _uiId.Value);
+
+                    item.IngredientId = ingredientId;
+                    item.IngredientName = ingredientName;
+                    item.UnitId = unitId;
+                    item.UnitName = unitName;
+                    item.Quantity = quantity;
+
+                    if (item.State == EditState.Unchanged)
+                        item.State = EditState.Modified;
+                }
+
+                DialogResult = DialogResult.OK;
+                Close();
             }
             catch (Exception ex) {
-                MessageBox.Show(
-                    ex.Message,
-                    "Fout",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
+                MessageBox.Show(ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -158,6 +170,10 @@ namespace RecipePlanner.UI {
             UnitSelector.SelectedIndex = UnitSelector.FindStringExact(selectedIngredient.DefaultUnitName);
             Quantity.Focus();
 
+        }
+
+        private void RecipeIngredientEditForm_Load(object sender, EventArgs e) {
+            IngredientSelector.Focus();
         }
     }
 }

@@ -61,7 +61,7 @@
             IngredientSelector.Location = new Point(231, 41);
             IngredientSelector.Name = "IngredientSelector";
             IngredientSelector.Size = new Size(462, 40);
-            IngredientSelector.TabIndex = 8;
+            IngredientSelector.TabIndex = 1;
             IngredientSelector.SelectedIndexChanged += IngredientSelector_SelectedIndexChanged;
             // 
             // label2
@@ -70,7 +70,7 @@
             label2.Location = new Point(19, 103);
             label2.Name = "label2";
             label2.Size = new Size(201, 32);
-            label2.TabIndex = 9;
+            label2.TabIndex = 2;
             label2.Text = "Eenheid in recept";
             // 
             // UnitSelector
@@ -79,7 +79,7 @@
             UnitSelector.Location = new Point(231, 103);
             UnitSelector.Name = "UnitSelector";
             UnitSelector.Size = new Size(306, 40);
-            UnitSelector.TabIndex = 10;
+            UnitSelector.TabIndex = 3;
             // 
             // label1
             // 
@@ -87,7 +87,7 @@
             label1.Location = new Point(19, 41);
             label1.Name = "label1";
             label1.Size = new Size(124, 32);
-            label1.TabIndex = 11;
+            label1.TabIndex = 0;
             label1.Text = "Ingredient";
             // 
             // label3
@@ -96,7 +96,7 @@
             label3.Location = new Point(19, 170);
             label3.Name = "label3";
             label3.Size = new Size(196, 32);
-            label3.TabIndex = 12;
+            label3.TabIndex = 4;
             label3.Text = "Aantal eenheden";
             // 
             // Quantity
@@ -104,7 +104,7 @@
             Quantity.Location = new Point(231, 163);
             Quantity.Name = "Quantity";
             Quantity.Size = new Size(170, 39);
-            Quantity.TabIndex = 13;
+            Quantity.TabIndex = 5;
             // 
             // RecipeIngredientEditForm
             // 
@@ -123,6 +123,7 @@
             Name = "RecipeIngredientEditForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "RecipeIngredientEditForm";
+            Load += RecipeIngredientEditForm_Load;
             ResumeLayout(false);
             PerformLayout();
         }
