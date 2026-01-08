@@ -24,11 +24,13 @@
         /// </summary>
         private void InitializeComponent() {
             SaveIngredient = new Button();
-            label2 = new Label();
             UnitSelector = new ComboBox();
             label1 = new Label();
             IngredientName = new TextBox();
             Cancel = new Button();
+            CountForOverlap = new CheckBox();
+            label2 = new Label();
+            label3 = new Label();
             SuspendLayout();
             // 
             // SaveIngredient
@@ -42,19 +44,10 @@
             SaveIngredient.UseVisualStyleBackColor = true;
             SaveIngredient.Click += SaveIngredient_ClickAsync;
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(30, 97);
-            label2.Name = "label2";
-            label2.Size = new Size(100, 32);
-            label2.TabIndex = 2;
-            label2.Text = "Eenheid";
-            // 
             // UnitSelector
             // 
             UnitSelector.FormattingEnabled = true;
-            UnitSelector.Location = new Point(206, 97);
+            UnitSelector.Location = new Point(268, 97);
             UnitSelector.Name = "UnitSelector";
             UnitSelector.Size = new Size(306, 40);
             UnitSelector.TabIndex = 3;
@@ -70,7 +63,7 @@
             // 
             // IngredientName
             // 
-            IngredientName.Location = new Point(206, 38);
+            IngredientName.Location = new Point(268, 38);
             IngredientName.Name = "IngredientName";
             IngredientName.Size = new Size(472, 39);
             IngredientName.TabIndex = 1;
@@ -86,6 +79,33 @@
             Cancel.UseVisualStyleBackColor = true;
             Cancel.Click += Cancel_Click;
             // 
+            // CountForOverlap
+            // 
+            CountForOverlap.AutoSize = true;
+            CountForOverlap.Location = new Point(268, 169);
+            CountForOverlap.Name = "CountForOverlap";
+            CountForOverlap.Size = new Size(28, 27);
+            CountForOverlap.TabIndex = 6;
+            CountForOverlap.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(30, 97);
+            label2.Name = "label2";
+            label2.Size = new Size(100, 32);
+            label2.TabIndex = 2;
+            label2.Text = "Eenheid";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(30, 164);
+            label3.Name = "label3";
+            label3.Size = new Size(219, 32);
+            label3.TabIndex = 7;
+            label3.Text = "Telt mee in overlap";
+            // 
             // IngredientEditForm
             // 
             AcceptButton = SaveIngredient;
@@ -93,6 +113,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = Cancel;
             ClientSize = new Size(866, 313);
+            Controls.Add(label3);
+            Controls.Add(CountForOverlap);
             Controls.Add(Cancel);
             Controls.Add(SaveIngredient);
             Controls.Add(label2);
@@ -110,10 +132,12 @@
         #endregion
 
         private Button SaveIngredient;
-        private Label label2;
         private ComboBox UnitSelector;
         private Label label1;
         private TextBox IngredientName;
         private Button Cancel;
+        private CheckBox CountForOverlap;
+        private Label label2;
+        private Label label3;
     }
 }

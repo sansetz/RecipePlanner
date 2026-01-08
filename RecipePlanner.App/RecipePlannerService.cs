@@ -27,7 +27,8 @@ namespace RecipePlanner.App {
                 .Select(r => new IngredientListItem(
                     r.Id,
                     r.Name,
-                    r.DefaultUnitName
+                    r.DefaultUnitName,
+                    r.CountForOverlap
                 ))
                 .ToList();
         }
@@ -38,25 +39,27 @@ namespace RecipePlanner.App {
         public async Task<int> CreateIngredientAsync(
             string name,
             int defaultUnitId,
+            bool countForOverlap = false,
             CancellationToken ct = default
         ) {
             name = name.Trim();
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is required", nameof(name));
 
-            return await _storage.AddIngredientAsync(name, defaultUnitId, ct);
+            return await _storage.AddIngredientAsync(name, defaultUnitId, countForOverlap, ct);
         }
 
         public async Task UpdateIngredientAsync(
             int id, string name,
             int defaultUnitId,
+            bool countForOverlap = false,
             CancellationToken ct = default
         ) {
             name = name.Trim();
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is required.", nameof(name));
 
-            await _storage.UpdateIngredientAsync(id, name, defaultUnitId, ct);
+            await _storage.UpdateIngredientAsync(id, name, defaultUnitId, countForOverlap, ct);
         }
 
         public async Task DeleteIngredientAsync(int id, CancellationToken ct = default) {

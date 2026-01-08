@@ -20,6 +20,7 @@ namespace RecipePlanner.UI {
 
             await LoadUnitsAsync();
             UnitSelector.SelectedIndex = -1;
+            CountForOverlap.Checked = false;
 
             this.Text = "Nieuw ingredient aanmaken";
             base.ShowDialog(owner);
@@ -34,6 +35,8 @@ namespace RecipePlanner.UI {
 
             _ingredientId = ingredient.Id;
             IngredientName.Text = ingredient.Name;
+
+            CountForOverlap.Checked = ingredient.CountForOverlap;
 
             await LoadUnitsAsync();
 
@@ -62,7 +65,7 @@ namespace RecipePlanner.UI {
 
                 var unitId = (int)UnitSelector.SelectedValue!; //validate already checked for null
 
-                await SaveIngredientToDB(IngredientName.Text, unitId);
+                await SaveIngredientToDB(IngredientName.Text, unitId, CountForOverlap.Checked);
 
                 DialogResult = DialogResult.OK;
                 this.Close();
@@ -92,19 +95,21 @@ namespace RecipePlanner.UI {
 
             return true;
         }
-        private async Task SaveIngredientToDB(string name, int unitId) {
+        private async Task SaveIngredientToDB(string name, int unitId, bool countForOverlap) {
 
             if (_ingredientId == null) {
                 await _recipePlannerService.CreateIngredientAsync(
                     name,
-                    unitId
+                    unitId,
+                    countForOverlap
                 );
             }
             else {
                 await _recipePlannerService.UpdateIngredientAsync(
                     _ingredientId.Value,
                     name,
-                    unitId
+                    unitId,
+                    countForOverlap
                 );
             }
         }

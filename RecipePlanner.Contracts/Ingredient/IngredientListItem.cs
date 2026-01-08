@@ -2,7 +2,8 @@
     public sealed record IngredientListItem(
         int Id,
         string Name,
-        string? DefaultUnitName
+        string? DefaultUnitName,
+        bool CountForOverlap
     );
 
 }

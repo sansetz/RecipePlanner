@@ -10,8 +10,8 @@ namespace RecipePlanner.Data {
 
         Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default);
         Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default);
-        Task<int> AddIngredientAsync(string name, int defaultUnitId, CancellationToken ct = default);
-        Task UpdateIngredientAsync(int id, string name, int defaultUnitId, CancellationToken ct = default);
+        Task<int> AddIngredientAsync(string name, int defaultUnitId, bool countForOverlap, CancellationToken ct = default);
+        Task UpdateIngredientAsync(int id, string name, int defaultUnitId, bool countForOverlap, CancellationToken ct = default);
         Task DeleteIngredientAsync(int id, CancellationToken ct = default);
 
         Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
@@ -59,7 +59,8 @@ namespace RecipePlanner.Data {
                 .Select(i => new IngredientListItem(
                     i.Id,
                     i.Name,
-                    i.DefaultUnit != null ? i.DefaultUnit.Name : null
+                    i.DefaultUnit != null ? i.DefaultUnit.Name : null,
+                    i.CountForOverlap
                 ))
                 .ToListAsync(ct);
         }
@@ -72,16 +73,16 @@ namespace RecipePlanner.Data {
                 .FirstOrDefaultAsync(i => i.Id == id, ct);
         }
 
-        public async Task<int> AddIngredientAsync(string name, int defaultUnitId, CancellationToken ct = default) {
+        public async Task<int> AddIngredientAsync(string name, int defaultUnitId, bool countForOverlap, CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
-            var ingredient = new Ingredient { Name = name, DefaultUnitId = defaultUnitId };
+            var ingredient = new Ingredient { Name = name, DefaultUnitId = defaultUnitId, CountForOverlap = countForOverlap };
             db.Ingredients.Add(ingredient);
             await db.SaveChangesAsync(ct);
 
             return ingredient.Id;
         }
-        public async Task UpdateIngredientAsync(int id, string name, int defaultUnitId, CancellationToken ct = default) {
+        public async Task UpdateIngredientAsync(int id, string name, int defaultUnitId, bool countForOverlap, CancellationToken ct = default) {
 
             await using var db = _factory.CreateDbContext();
 
@@ -91,6 +92,7 @@ namespace RecipePlanner.Data {
 
             ingredient.Name = name;
             ingredient.DefaultUnitId = defaultUnitId;
+            ingredient.CountForOverlap = countForOverlap;
 
             await db.SaveChangesAsync(ct);
         }
