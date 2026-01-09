@@ -40,7 +40,6 @@
             ListItemsGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
             ListItemsGrid.AutoGenerateColumns = true;
             ListItemsGrid.ReadOnly = true;
-            ListItemsGrid.Enabled = false;
         }
 
         private void DataSpecificConfigGrid() {

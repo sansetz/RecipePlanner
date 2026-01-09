@@ -1,0 +1,163 @@
+﻿namespace RecipePlanner.UI.Controls {
+    partial class RecipePickerDayControl {
+        /// <summary> 
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Component Designer generated code
+
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent() {
+            ControlPanel = new Panel();
+            InfoPanel = new Panel();
+            SelectedRecipe = new Label();
+            RecipesSelector = new DataGridView();
+            ToolbarPanel = new Panel();
+            label1 = new Label();
+            TitlePanel = new Panel();
+            DayTitle = new Label();
+            ControlPanel.SuspendLayout();
+            InfoPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)RecipesSelector).BeginInit();
+            ToolbarPanel.SuspendLayout();
+            TitlePanel.SuspendLayout();
+            SuspendLayout();
+            // 
+            // ControlPanel
+            // 
+            ControlPanel.Controls.Add(InfoPanel);
+            ControlPanel.Controls.Add(RecipesSelector);
+            ControlPanel.Controls.Add(ToolbarPanel);
+            ControlPanel.Controls.Add(TitlePanel);
+            ControlPanel.Dock = DockStyle.Fill;
+            ControlPanel.Location = new Point(0, 0);
+            ControlPanel.Name = "ControlPanel";
+            ControlPanel.Padding = new Padding(10);
+            ControlPanel.Size = new Size(603, 735);
+            ControlPanel.TabIndex = 0;
+            // 
+            // InfoPanel
+            // 
+            InfoPanel.BackColor = SystemColors.ActiveCaption;
+            InfoPanel.BorderStyle = BorderStyle.FixedSingle;
+            InfoPanel.Controls.Add(SelectedRecipe);
+            InfoPanel.Dock = DockStyle.Bottom;
+            InfoPanel.Location = new Point(10, 682);
+            InfoPanel.Name = "InfoPanel";
+            InfoPanel.Size = new Size(583, 43);
+            InfoPanel.TabIndex = 4;
+            // 
+            // SelectedRecipe
+            // 
+            SelectedRecipe.AutoSize = true;
+            SelectedRecipe.Location = new Point(3, 0);
+            SelectedRecipe.Name = "SelectedRecipe";
+            SelectedRecipe.Size = new Size(78, 32);
+            SelectedRecipe.TabIndex = 0;
+            SelectedRecipe.Text = "label2";
+            // 
+            // RecipesSelector
+            // 
+            RecipesSelector.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            RecipesSelector.ColumnHeadersVisible = false;
+            RecipesSelector.Dock = DockStyle.Fill;
+            RecipesSelector.EnableHeadersVisualStyles = false;
+            RecipesSelector.Location = new Point(10, 158);
+            RecipesSelector.Name = "RecipesSelector";
+            RecipesSelector.RowHeadersVisible = false;
+            RecipesSelector.RowHeadersWidth = 82;
+            RecipesSelector.Size = new Size(583, 567);
+            RecipesSelector.TabIndex = 3;
+            RecipesSelector.CellFormatting += RecipesSelector_CellFormatting;
+            RecipesSelector.CellMouseDown += RecipesSelector_CellMouseDown;
+            RecipesSelector.CellMouseUp += RecipesSelector_CellMouseUp;
+            RecipesSelector.DataBindingComplete += RecipesSelector_DataBindingComplete;
+            RecipesSelector.SelectionChanged += RecipesSelector_SelectionChanged;
+            // 
+            // ToolbarPanel
+            // 
+            ToolbarPanel.BackColor = Color.Black;
+            ToolbarPanel.Controls.Add(label1);
+            ToolbarPanel.Dock = DockStyle.Top;
+            ToolbarPanel.Location = new Point(10, 92);
+            ToolbarPanel.Name = "ToolbarPanel";
+            ToolbarPanel.Size = new Size(583, 66);
+            ToolbarPanel.TabIndex = 2;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.ForeColor = SystemColors.ButtonHighlight;
+            label1.Location = new Point(170, 18);
+            label1.Name = "label1";
+            label1.Size = new Size(252, 32);
+            label1.TabIndex = 0;
+            label1.Text = "Todo: filter, search, etc";
+            // 
+            // TitlePanel
+            // 
+            TitlePanel.BackColor = Color.Black;
+            TitlePanel.Controls.Add(DayTitle);
+            TitlePanel.Dock = DockStyle.Top;
+            TitlePanel.Location = new Point(10, 10);
+            TitlePanel.Name = "TitlePanel";
+            TitlePanel.Size = new Size(583, 82);
+            TitlePanel.TabIndex = 0;
+            // 
+            // DayTitle
+            // 
+            DayTitle.BackColor = Color.Transparent;
+            DayTitle.Dock = DockStyle.Fill;
+            DayTitle.Font = new Font("Bernard MT Condensed", 25.875F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            DayTitle.ForeColor = Color.SteelBlue;
+            DayTitle.Location = new Point(0, 0);
+            DayTitle.Name = "DayTitle";
+            DayTitle.Size = new Size(583, 82);
+            DayTitle.TabIndex = 0;
+            DayTitle.Text = "Maandag";
+            DayTitle.TextAlign = ContentAlignment.BottomCenter;
+            // 
+            // RecipePickerDayControl
+            // 
+            AutoScaleDimensions = new SizeF(13F, 32F);
+            AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(ControlPanel);
+            Name = "RecipePickerDayControl";
+            Size = new Size(603, 735);
+            ControlPanel.ResumeLayout(false);
+            InfoPanel.ResumeLayout(false);
+            InfoPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)RecipesSelector).EndInit();
+            ToolbarPanel.ResumeLayout(false);
+            ToolbarPanel.PerformLayout();
+            TitlePanel.ResumeLayout(false);
+            ResumeLayout(false);
+        }
+
+        #endregion
+
+        private Panel ControlPanel;
+        private DataGridView RecipesSelector;
+        private Panel ToolbarPanel;
+        private Panel TitlePanel;
+        private Label DayTitle;
+        private Label label1;
+        private Panel InfoPanel;
+        private Label SelectedRecipe;
+    }
+}

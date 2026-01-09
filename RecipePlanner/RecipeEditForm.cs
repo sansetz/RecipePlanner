@@ -273,12 +273,12 @@ namespace RecipePlanner.UI {
 
             var view = _recipeIngredients
                 .Where(x => x.State != EditState.Deleted)
-                .Select(x => new RecipeIngredientGridRow {
-                    UiId = x.UiId,
-                    IngredientName = x.IngredientName,
-                    UnitName = x.UnitName,
-                    Quantity = x.Quantity
-                })
+                .Select(x => new RecipeIngredientGridRow(
+                    x.UiId,
+                    x.IngredientName,
+                    x.UnitName,
+                    x.Quantity
+                ))
                 .ToList();
 
             IngredientsListView.BindData(view);
