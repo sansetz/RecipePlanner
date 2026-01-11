@@ -4,7 +4,9 @@
         string Name,
         bool HasOverlap,
         int OverlapCount,
-        bool UsedInOtherDays
+        bool UsedInOtherDays,
+        string? OverlapIngredientsText,
+        string? UsedInDayName
     );
 
 }

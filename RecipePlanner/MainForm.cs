@@ -127,8 +127,8 @@ namespace RecipePlanner {
                 if (!_recipeById.TryGetValue(kv.Value.Value, out var recipe))
                     continue;
 
-                foreach (var ingredientId in recipe.CountedIngredientIds)
-                    used.Add(ingredientId);
+                foreach (var ci in recipe.CountedIngredients)
+                    used.Add(ci.Id);
             }
 
             return used;
@@ -142,17 +142,36 @@ namespace RecipePlanner {
                 ? id
                 : null;
 
+
+            var usedRecipeDayNameById = _selectedRecipeIdByDay
+                .Where(kv => kv.Key != dayIndex && kv.Value.HasValue)
+                .GroupBy(kv => kv.Value!.Value)
+                .ToDictionary(
+                    g => g.Key,
+                    g => WeekDayHelper.GetDayName(WeekDayHelper.ToDayOfWeek(g.First().Key))
+                );
+
             var recipesForDay = _allRecipes
                 .Select(r => {
-                    var overlapCount = r.CountedIngredientIds
-                        .Count(id => usedIngredients.Contains(id));
+                    var overlapList = r.CountedIngredients
+                        .Where(ci => usedIngredients.Contains(ci.Id))
+                        .Select(ci => ci.Name)
+                        .Distinct()
+                        .OrderBy(n => n)
+                        .ToList();
+
+                    var overlapText = overlapList.Count == 0 ? null : string.Join(", ", overlapList);
+
+                    usedRecipeDayNameById.TryGetValue(r.Id, out var usedDayName);
 
                     return new RecipeChoiceItem(
                         r.Id,
                         r.Name,
-                        overlapCount > 0,
-                        overlapCount,
-                        chosenElsewhere.Contains(r.Id)
+                        overlapList.Count > 0,
+                        overlapList.Count,
+                        chosenElsewhere.Contains(r.Id),
+                        overlapText,
+                        usedDayName
                     );
                 })
                 .OrderByDescending(r => r.UsedInOtherDays)

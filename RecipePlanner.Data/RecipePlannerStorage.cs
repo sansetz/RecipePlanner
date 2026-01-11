@@ -174,34 +174,40 @@ namespace RecipePlanner.Data {
         public async Task<List<RecipeSource>> GetRecipeSourcesForPlanningAsync(CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
-
             // 1) Basis recepten
             var recipes = await db.Recipes
                 .AsNoTracking()
                 .Select(r => new { r.Id, r.Name })
                 .ToListAsync(ct);
 
-            // 2) Alle counted ingredient koppelingen (plat)
+            // 2) Counted ingredients (plat) met naam
             var counted = await db.RecipeIngredients
                 .AsNoTracking()
                 .Where(ri => ri.Ingredient.CountForOverlap)
-                .Select(ri => new { ri.RecipeId, ri.IngredientId })
+                .Select(ri => new { ri.RecipeId, ri.IngredientId, IngredientName = ri.Ingredient.Name })
                 .Distinct()
                 .ToListAsync(ct);
 
             var countedByRecipeId = counted
                 .GroupBy(x => x.RecipeId)
-                .ToDictionary(g => g.Key, g => g.Select(x => x.IngredientId).ToList());
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => new CountedIngredient(x.IngredientId, x.IngredientName))
+                          .Distinct()
+                          .OrderBy(x => x.Name)
+                          .ToList()
+                );
 
             // 3) Samenvoegen naar RecipeSource
             return recipes
                 .Select(r => new RecipeSource(
                     r.Id,
                     r.Name,
-                    countedByRecipeId.TryGetValue(r.Id, out var ids) ? ids : new List<int>()
+                    countedByRecipeId.TryGetValue(r.Id, out var list) ? list : new List<CountedIngredient>()
                 ))
                 .ToList();
         }
+
         // ***************** RecipeIngredients *****************
 
         public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(

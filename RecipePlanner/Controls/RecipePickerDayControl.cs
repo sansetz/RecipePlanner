@@ -1,5 +1,5 @@
-﻿using RecipePlanner.Contracts.PlannedDay;
-using System.Globalization;
+﻿using RecipePlanner.App;
+using RecipePlanner.Contracts.PlannedDay;
 
 namespace RecipePlanner.UI.Controls {
     public partial class RecipePickerDayControl : UserControl {
@@ -93,8 +93,6 @@ namespace RecipePlanner.UI.Controls {
                     row.DefaultCellStyle.BackColor = Color.Empty;
                     row.DefaultCellStyle.ForeColor = Color.Empty;
                 }
-                //row.DefaultCellStyle.SelectionBackColor = Color.Black;
-                //row.DefaultCellStyle.SelectionForeColor = Color.White;
             }
         }
 
@@ -102,16 +100,10 @@ namespace RecipePlanner.UI.Controls {
             _isBinding = true;
             _dayContext = daycontext;
 
-            DayTitle.Text = GetDayName(ToDayOfWeek(daycontext.DayIndex));
+            DayTitle.Text = WeekDayHelper.GetDayName(WeekDayHelper.ToDayOfWeek(daycontext.DayIndex));
             LoadRecipes();
         }
 
-        private string GetDayName(DayOfWeek dayOfWeek) {
-            var cultureInfo = new CultureInfo("nl-NL");
-            var dateTimeInfo = cultureInfo.DateTimeFormat;
-
-            return dateTimeInfo.GetDayName(dayOfWeek);
-        }
 
         private void LoadRecipes() {
             if (_dayContext == null) return;
@@ -134,6 +126,9 @@ namespace RecipePlanner.UI.Controls {
             RecipesSelector.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
             RecipesSelector.AutoGenerateColumns = false;
             RecipesSelector.ReadOnly = true;
+
+            RecipesSelector.ShowCellToolTips = true;
+            RecipesSelector.CellToolTipTextNeeded += RecipesSelector_CellToolTipTextNeeded;
 
             RecipesSelector.EnableHeadersVisualStyles = false;
             RecipesSelector.ColumnHeadersDefaultCellStyle.SelectionBackColor =
@@ -158,15 +153,25 @@ namespace RecipePlanner.UI.Controls {
             }
         }
 
+        private void RecipesSelector_CellToolTipTextNeeded(object? sender, DataGridViewCellToolTipTextNeededEventArgs e) {
+            if (e.RowIndex < 0) return;
 
-        private static DayOfWeek ToDayOfWeek(int dayIndex) {
-            if (dayIndex < 0 || dayIndex > 6)
-                throw new ArgumentOutOfRangeException(nameof(dayIndex));
+            var row = RecipesSelector.Rows[e.RowIndex];
+            if (row.DataBoundItem is not RecipeChoiceItem item) return;
 
-            // DayOfWeek: Sunday = 0, Monday = 1, ...
-            // Planner:   Monday = 0, Tuesday = 1, ...
-            return (DayOfWeek)(((int)DayOfWeek.Monday + dayIndex) % 7);
+            // Grijze rij: al gekozen
+            if (item.UsedInOtherDays && !string.IsNullOrWhiteSpace(item.UsedInDayName)) {
+                e.ToolTipText = $"Is al gekozen op {item.UsedInDayName}";
+                return;
+            }
+
+            // Blauwe rij: overlap
+            if (item.HasOverlap && !string.IsNullOrWhiteSpace(item.OverlapIngredientsText)) {
+                e.ToolTipText = "Overlap door: " + item.OverlapIngredientsText;
+            }
         }
+
+
 
         private void ClearSelection() {
             RecipesSelector.ClearSelection();
