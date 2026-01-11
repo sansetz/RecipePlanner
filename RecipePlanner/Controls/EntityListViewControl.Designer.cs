@@ -79,6 +79,7 @@
             ListItemsGrid.Dock = DockStyle.Fill;
             ListItemsGrid.Location = new Point(0, 94);
             ListItemsGrid.Name = "ListItemsGrid";
+            ListItemsGrid.RowHeadersVisible = false;
             ListItemsGrid.RowHeadersWidth = 82;
             ListItemsGrid.Size = new Size(778, 744);
             ListItemsGrid.TabIndex = 1;

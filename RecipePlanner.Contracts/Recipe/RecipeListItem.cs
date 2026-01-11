@@ -8,6 +8,7 @@
     public sealed record RecipeListItem(
         int Id,
         string Name,
+        string? Info,
         PrepTime? PrepTime
     );
 }

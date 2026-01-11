@@ -17,8 +17,8 @@ namespace RecipePlanner.Data {
 
         Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
         Task<Recipe?> GetRecipeByIdAsync(int id, CancellationToken ct = default);
-        Task<int> AddRecipeAsync(string name, PrepTime preptime, CancellationToken ct = default);
-        Task UpdateRecipeAsync(int id, string name, PrepTime preptime, CancellationToken ct = default);
+        Task<int> AddRecipeAsync(string name, PrepTime preptime, string? info, CancellationToken ct = default);
+        Task UpdateRecipeAsync(int id, string name, PrepTime preptime, string? info, CancellationToken ct = default);
         Task DeleteRecipeAsync(int id, CancellationToken ct = default);
         Task<List<RecipeSource>> GetRecipeSourcesForPlanningAsync(CancellationToken ct = default);
 
@@ -125,6 +125,7 @@ namespace RecipePlanner.Data {
                 .Select(r => new RecipeListItem(
                     r.Id,
                     r.Name,
+                    r.Info,
                     r.PrepTime
             ))
             .ToListAsync(ct);
@@ -137,17 +138,17 @@ namespace RecipePlanner.Data {
                 .FirstOrDefaultAsync(i => i.Id == id, ct);
         }
 
-        public async Task<int> AddRecipeAsync(string name, PrepTime preptime, CancellationToken ct = default) {
+        public async Task<int> AddRecipeAsync(string name, PrepTime preptime, string? info, CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
-            var recipe = new Recipe { Name = name, PrepTime = preptime };
+            var recipe = new Recipe { Name = name, PrepTime = preptime, Info = info };
 
             db.Recipes.Add(recipe);
             await db.SaveChangesAsync(ct);
 
             return recipe.Id;
         }
-        public async Task UpdateRecipeAsync(int id, string name, PrepTime preptime, CancellationToken ct = default) {
+        public async Task UpdateRecipeAsync(int id, string name, PrepTime preptime, string? info, CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
             var recipe = await db.Recipes.FindAsync([id], ct);
@@ -156,6 +157,7 @@ namespace RecipePlanner.Data {
 
             recipe.Name = name;
             recipe.PrepTime = preptime;
+            recipe.Info = info;
 
             await db.SaveChangesAsync(ct);
         }

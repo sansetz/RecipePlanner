@@ -31,15 +31,16 @@
             RecipesListView.Dock = DockStyle.Fill;
             RecipesListView.Location = new Point(0, 0);
             RecipesListView.Name = "RecipesListView";
-            RecipesListView.Size = new Size(771, 647);
+            RecipesListView.Size = new Size(1408, 848);
             RecipesListView.TabIndex = 0;
             // 
             // RecipesForm
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(771, 647);
+            ClientSize = new Size(1408, 848);
             Controls.Add(RecipesListView);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "RecipesForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Recepten";

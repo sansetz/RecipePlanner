@@ -30,13 +30,13 @@ namespace RecipePlanner.UI {
         public void ShowDialogForCreate(IWin32Window? owner = null) {
             _recipeId = null;
             RecipeName.Clear();
+            RecipeInfo.Clear();
 
             FillPreptimes();
             PrepTimeSelector.SelectedIndex = -1;
 
             this.Text = "Nieuw recept aanmaken";
             IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
-
 
             _recipeIngredients = new List<RecipeIngredientEditItem>();
 
@@ -52,6 +52,7 @@ namespace RecipePlanner.UI {
 
             _recipeId = recipe.Id;
             RecipeName.Text = recipe.Name;
+            RecipeInfo.Text = recipe.Info;
 
             FillPreptimes();
             PrepTimeSelector.SelectedItem = recipe.PrepTime;
@@ -77,7 +78,7 @@ namespace RecipePlanner.UI {
 
                 var prepTime = (PrepTime)PrepTimeSelector.SelectedValue!; //validate already checked for null
 
-                await SaveRecipeToDB(RecipeName.Text, prepTime);
+                await SaveRecipeToDB(RecipeName.Text, prepTime, RecipeInfo.Text);
 
                 DialogResult = DialogResult.OK;
                 this.Close();
@@ -111,16 +112,16 @@ namespace RecipePlanner.UI {
 
 
 
-        private async Task SaveRecipeToDB(string name, PrepTime preptime) {
-            // 1) Recipe zelf opslaan
+        private async Task SaveRecipeToDB(string name, PrepTime preptime, string info) {
+            //first create recipe
             if (_recipeId == null) {
-                _recipeId = await _recipePlannerService.CreateRecipeAsync(name, preptime);
+                _recipeId = await _recipePlannerService.CreateRecipeAsync(name, preptime, info);
             }
             else {
-                await _recipePlannerService.UpdateRecipeAsync(_recipeId.Value, name, preptime);
+                await _recipePlannerService.UpdateRecipeAsync(_recipeId.Value, name, preptime, info);
             }
 
-            // 2) Ingredients syncen
+            //sync ingredients
             if (_recipeIngredients == null)
                 throw new InvalidOperationException("Recipe ingredients list is null.");
 
@@ -157,7 +158,7 @@ namespace RecipePlanner.UI {
                 item.State = EditState.Unchanged;
             }
 
-            // Optioneel: verwijder deleted items uit de lijst na succesvolle save
+            //remove all deleted ingredients from list
             _recipeIngredients.RemoveAll(x => x.State == EditState.Deleted);
         }
 

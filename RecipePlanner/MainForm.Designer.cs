@@ -89,7 +89,7 @@
             Exit.Name = "Exit";
             Exit.Size = new Size(153, 62);
             Exit.TabIndex = 7;
-            Exit.Text = "Exit";
+            Exit.Text = "Sluiten";
             Exit.UseVisualStyleBackColor = true;
             Exit.Click += Exit_Click;
             // 
@@ -272,11 +272,11 @@
             // 
             // RecipesButton
             // 
-            RecipesButton.Location = new Point(306, 19);
+            RecipesButton.Location = new Point(337, 19);
             RecipesButton.Name = "RecipesButton";
             RecipesButton.Size = new Size(248, 62);
             RecipesButton.TabIndex = 5;
-            RecipesButton.Text = "Recipes";
+            RecipesButton.Text = "Recepten beheren";
             RecipesButton.UseVisualStyleBackColor = true;
             RecipesButton.Click += RecipesButton_ClickAsync;
             // 
@@ -284,9 +284,9 @@
             // 
             IngredientsButton.Location = new Point(32, 19);
             IngredientsButton.Name = "IngredientsButton";
-            IngredientsButton.Size = new Size(248, 62);
+            IngredientsButton.Size = new Size(281, 62);
             IngredientsButton.TabIndex = 4;
-            IngredientsButton.Text = "Ingredients";
+            IngredientsButton.Text = "Ingredienten beheren";
             IngredientsButton.UseVisualStyleBackColor = true;
             IngredientsButton.Click += IngredientsButton_Click;
             // 

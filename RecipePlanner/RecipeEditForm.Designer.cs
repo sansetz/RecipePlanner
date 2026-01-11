@@ -32,13 +32,15 @@
             panel1 = new Panel();
             IngredientsListView = new EntityListViewControl();
             label3 = new Label();
+            label4 = new Label();
+            RecipeInfo = new TextBox();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
             // Cancel
             // 
             Cancel.DialogResult = DialogResult.Cancel;
-            Cancel.Location = new Point(356, 706);
+            Cancel.Location = new Point(356, 750);
             Cancel.Name = "Cancel";
             Cancel.Size = new Size(236, 59);
             Cancel.TabIndex = 9;
@@ -49,7 +51,7 @@
             // SaveRecipe
             // 
             SaveRecipe.DialogResult = DialogResult.OK;
-            SaveRecipe.Location = new Point(584, 706);
+            SaveRecipe.Location = new Point(584, 750);
             SaveRecipe.Name = "SaveRecipe";
             SaveRecipe.Size = new Size(236, 59);
             SaveRecipe.TabIndex = 8;
@@ -60,7 +62,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(36, 33);
+            label1.Location = new Point(37, 26);
             label1.Name = "label1";
             label1.Size = new Size(77, 32);
             label1.TabIndex = 6;
@@ -70,7 +72,7 @@
             // 
             RecipeName.Location = new Point(212, 26);
             RecipeName.Name = "RecipeName";
-            RecipeName.Size = new Size(472, 39);
+            RecipeName.Size = new Size(608, 39);
             RecipeName.TabIndex = 7;
             // 
             // PrepTimeSelector
@@ -84,7 +86,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(36, 97);
+            label2.Location = new Point(36, 89);
             label2.Name = "label2";
             label2.Size = new Size(160, 32);
             label2.TabIndex = 11;
@@ -94,7 +96,7 @@
             // 
             panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Controls.Add(IngredientsListView);
-            panel1.Location = new Point(36, 236);
+            panel1.Location = new Point(36, 284);
             panel1.Name = "panel1";
             panel1.Size = new Size(784, 438);
             panel1.TabIndex = 12;
@@ -110,11 +112,27 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(36, 188);
+            label3.Location = new Point(36, 236);
             label3.Name = "label3";
             label3.Size = new Size(324, 32);
             label3.TabIndex = 13;
             label3.Text = "Aan te schaffen ingredienten";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(36, 150);
+            label4.Name = "label4";
+            label4.Size = new Size(135, 32);
+            label4.TabIndex = 14;
+            label4.Text = "Recept info";
+            // 
+            // RecipeInfo
+            // 
+            RecipeInfo.Location = new Point(212, 150);
+            RecipeInfo.Name = "RecipeInfo";
+            RecipeInfo.Size = new Size(608, 39);
+            RecipeInfo.TabIndex = 15;
             // 
             // RecipeEditForm
             // 
@@ -122,7 +140,9 @@
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = Cancel;
-            ClientSize = new Size(849, 800);
+            ClientSize = new Size(849, 832);
+            Controls.Add(RecipeInfo);
+            Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(panel1);
             Controls.Add(label2);
@@ -151,5 +171,7 @@
         private Panel panel1;
         private EntityListViewControl IngredientsListView;
         private Label label3;
+        private Label label4;
+        private TextBox RecipeInfo;
     }
 }

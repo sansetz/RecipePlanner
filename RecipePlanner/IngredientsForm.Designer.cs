@@ -31,14 +31,14 @@
             IngredientsListView.Dock = DockStyle.Fill;
             IngredientsListView.Location = new Point(0, 0);
             IngredientsListView.Name = "IngredientsListView";
-            IngredientsListView.Size = new Size(799, 970);
+            IngredientsListView.Size = new Size(1258, 970);
             IngredientsListView.TabIndex = 0;
             // 
             // IngredientsForm
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(799, 970);
+            ClientSize = new Size(1258, 970);
             Controls.Add(IngredientsListView);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "IngredientsForm";
