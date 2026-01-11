@@ -1,4 +1,5 @@
 ﻿using RecipePlanner.Contracts.Ingredient;
+using RecipePlanner.Contracts.PlannedDay;
 using RecipePlanner.Contracts.Recipe;
 using RecipePlanner.Contracts.RecipeIngredient;
 using RecipePlanner.Data;
@@ -111,24 +112,8 @@ namespace RecipePlanner.App {
             await _storage.DeleteRecipeAsync(id, ct);
         }
 
-        public async Task<List<RecipeListItem>> GetOverlapRecipes(int recipeId) {
-
-            return await _storage.GetAllRecipesAsync();
-
-            //todo: dit is niet meer goed, moet aangepast worden, maar nu nog niet nodig
-
-            //var selectedIngredientIds = allRecipes
-            //    .Where(r => r.Id == recipeId)
-            //    .SelectMany(r => r.RecipeIngredients)
-            //    .Select(ri => ri.IngredientId)
-            //    .ToHashSet();
-
-            //return allRecipes
-            //    .Where(r => r.Id != recipeId) // niet met zichzelf vergelijken
-            //    .Where(r => r.RecipeIngredients
-            //        .Any(ri => selectedIngredientIds.Contains(ri.IngredientId)))
-            //    .ToList();
-
+        public async Task<List<RecipeSource>> GetRecipeSourcesForPlanningAsync(CancellationToken ct = default) {
+            return await _storage.GetRecipeSourcesForPlanningAsync(ct);
         }
 
         //***************** Recipe Ingredients *************

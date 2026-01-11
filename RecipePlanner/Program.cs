@@ -13,7 +13,10 @@ namespace RecipePlanner {
             // TODO's:
             // - Add boolean field to ingredient for marking if it should be used for finding overlap recipes
             // - Add close button to EntityListViewControl that closed the parent form
-            // - typing in combobox for selecting ingredients does not work correctly, can only type first letter
+            // - typing in combobox for selecting ingredients/recipes does not work correctly, can only type first letter
+            // - print shoppinglist
+            // - hover over recipes shows overlap ingredients
+            //
 
             ApplicationConfiguration.Initialize();
 

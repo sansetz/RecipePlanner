@@ -14,8 +14,8 @@ namespace RecipePlanner.UI {
         }
         private async void IngredientsForm_LoadAsync(object sender, EventArgs e) {
             IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
-            await LoadIngredientsAsync();
 
+            await LoadIngredientsAsync();
 
             IngredientsListView.AddClicked += IngredientsListView_AddClickedAsync;
             IngredientsListView.UpdateClicked += IngredientsListView_UpdateClickedAsync;

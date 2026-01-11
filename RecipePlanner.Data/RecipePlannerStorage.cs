@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipePlanner.Contracts.Ingredient;
+using RecipePlanner.Contracts.PlannedDay;
 using RecipePlanner.Contracts.Recipe;
 using RecipePlanner.Contracts.RecipeIngredient;
 using RecipePlanner.Entities;
@@ -19,6 +20,7 @@ namespace RecipePlanner.Data {
         Task<int> AddRecipeAsync(string name, PrepTime preptime, CancellationToken ct = default);
         Task UpdateRecipeAsync(int id, string name, PrepTime preptime, CancellationToken ct = default);
         Task DeleteRecipeAsync(int id, CancellationToken ct = default);
+        Task<List<RecipeSource>> GetRecipeSourcesForPlanningAsync(CancellationToken ct = default);
 
 
         Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId, CancellationToken ct = default);
@@ -37,6 +39,11 @@ namespace RecipePlanner.Data {
         public RecipePlannerStorage(IRecipePlannerDbContextFactory factory) {
             _factory = factory;
         }
+
+
+
+
+
 
         // ***************** Units *****************
         public async Task<List<Unit>> GetAllUnitsAsync(CancellationToken ct = default) {
@@ -164,6 +171,37 @@ namespace RecipePlanner.Data {
             await db.SaveChangesAsync(ct);
         }
 
+        public async Task<List<RecipeSource>> GetRecipeSourcesForPlanningAsync(CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+
+            // 1) Basis recepten
+            var recipes = await db.Recipes
+                .AsNoTracking()
+                .Select(r => new { r.Id, r.Name })
+                .ToListAsync(ct);
+
+            // 2) Alle counted ingredient koppelingen (plat)
+            var counted = await db.RecipeIngredients
+                .AsNoTracking()
+                .Where(ri => ri.Ingredient.CountForOverlap)
+                .Select(ri => new { ri.RecipeId, ri.IngredientId })
+                .Distinct()
+                .ToListAsync(ct);
+
+            var countedByRecipeId = counted
+                .GroupBy(x => x.RecipeId)
+                .ToDictionary(g => g.Key, g => g.Select(x => x.IngredientId).ToList());
+
+            // 3) Samenvoegen naar RecipeSource
+            return recipes
+                .Select(r => new RecipeSource(
+                    r.Id,
+                    r.Name,
+                    countedByRecipeId.TryGetValue(r.Id, out var ids) ? ids : new List<int>()
+                ))
+                .ToList();
+        }
         // ***************** RecipeIngredients *****************
 
         public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(
@@ -237,6 +275,7 @@ namespace RecipePlanner.Data {
             db.RecipeIngredients.Remove(recipeIngredient);
             await db.SaveChangesAsync(ct);
         }
+
 
 
         // ***************** Seed Data *****************

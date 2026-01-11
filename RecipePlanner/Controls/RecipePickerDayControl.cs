@@ -19,6 +19,85 @@ namespace RecipePlanner.UI.Controls {
             InitializeComponent();
             InitialConfig();
         }
+
+        private void RecipesSelector_SelectionChanged(object sender, EventArgs e) {
+            if (_isBinding)
+                return;
+
+            SetSelectedRecipeId();
+            SelectedRecipeChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void RecipesSelector_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
+            //kleuren hier zetten?
+        }
+
+        private void RecipesSelector_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e) {
+
+            if (RecipesSelector.DataSource is not List<RecipeChoiceItem> items) {
+                _isBinding = false;
+                return;
+            }
+
+            SetGridColors(items);
+            SetCorrectSelection(items);
+
+            BeginInvoke(new Action(() => _isBinding = false));
+        }
+        private void SetCorrectSelection(List<RecipeChoiceItem> items) {
+            if (_dayContext == null) return;
+
+            if (_dayContext.SelectedRecipeId.HasValue) {
+                var selectedId = _dayContext.SelectedRecipeId.Value;
+
+                // zoek index in de bound lijst
+                var index = items.FindIndex(x => x.Id == selectedId);
+
+                if (index >= 0 && index < RecipesSelector.Rows.Count) {
+                    var row = RecipesSelector.Rows[index];
+
+                    RecipesSelector.ClearSelection();
+
+                    if (row.Visible && row.Cells.Count > 0 && row.Cells[0].Visible) {
+                        RecipesSelector.CurrentCell = row.Cells[0];
+                    }
+
+                    row.Selected = true;
+
+                    // update jouw eigen state/label
+                    _selectedRecipeId = selectedId;
+                    SelectedRecipe.Text = "Gekozen recept: " + items[index].Name;
+                }
+                else {
+                    ClearSelection();
+                }
+            }
+            else {
+                ClearSelection();
+            }
+        }
+        private void SetGridColors(List<RecipeChoiceItem> items) {
+            for (int i = 0; i < items.Count && i < RecipesSelector.Rows.Count; i++) {
+                var item = items[i];
+                var row = RecipesSelector.Rows[i];
+
+                if (item.HasOverlap && !item.UsedInOtherDays) {
+                    row.DefaultCellStyle.BackColor = Color.LightSteelBlue;
+                    row.DefaultCellStyle.ForeColor = Color.Empty;
+                }
+                else if (item.UsedInOtherDays) {
+                    row.DefaultCellStyle.BackColor = Color.DarkGray;
+                    row.DefaultCellStyle.ForeColor = Color.DimGray;
+                }
+                else {
+                    row.DefaultCellStyle.BackColor = Color.Empty;
+                    row.DefaultCellStyle.ForeColor = Color.Empty;
+                }
+                //row.DefaultCellStyle.SelectionBackColor = Color.Black;
+                //row.DefaultCellStyle.SelectionForeColor = Color.White;
+            }
+        }
+
         public void SetContext(DayContext daycontext) {
             _isBinding = true;
             _dayContext = daycontext;
@@ -51,6 +130,7 @@ namespace RecipePlanner.UI.Controls {
             RecipesSelector.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             RecipesSelector.MultiSelect = false;
             RecipesSelector.AllowUserToResizeColumns = false;
+            RecipesSelector.AllowUserToAddRows = false;
             RecipesSelector.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
             RecipesSelector.AutoGenerateColumns = false;
             RecipesSelector.ReadOnly = true;
@@ -61,6 +141,9 @@ namespace RecipePlanner.UI.Controls {
 
             RecipesSelector.ColumnHeadersDefaultCellStyle.SelectionForeColor =
                 RecipesSelector.ColumnHeadersDefaultCellStyle.ForeColor;
+
+            RecipesSelector.DefaultCellStyle.SelectionBackColor = Color.Black;
+            RecipesSelector.DefaultCellStyle.SelectionForeColor = Color.White;
 
             RecipesSelector.Columns.Add(new DataGridViewTextBoxColumn {
                 Name = "RecipeName",
@@ -75,40 +158,7 @@ namespace RecipePlanner.UI.Controls {
             }
         }
 
-        private void RecipesSelector_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
-            if (e.RowIndex < 0) return; // header
 
-            var row = RecipesSelector.Rows[e.RowIndex];
-            if (row.DataBoundItem is not RecipeChoiceItem item) return;
-
-            if (item.HasOverlap) {
-                // Normale kleur
-                e.CellStyle.BackColor = Color.LightSteelBlue;
-
-                // Zodat de kleur niet "verdwijnt" bij selectie
-                e.CellStyle.SelectionForeColor = e.CellStyle.ForeColor;
-            }
-        }
-
-        public void SetSelectedRecipeId() {
-            var row = RecipesSelector.CurrentRow;
-
-            if ((row == null) || (row.DataBoundItem is not RecipeChoiceItem item)) {
-                _selectedRecipeId = null;
-                return;
-            }
-
-            _selectedRecipeId = item.Id;
-            SelectedRecipe.Text = "Gekozen recept: " + item.Name;
-        }
-
-        private void RecipesSelector_SelectionChanged(object sender, EventArgs e) {
-            if (_isBinding)
-                return;
-
-            SetSelectedRecipeId();
-            SelectedRecipeChanged?.Invoke(this, EventArgs.Empty);
-        }
         private static DayOfWeek ToDayOfWeek(int dayIndex) {
             if (dayIndex < 0 || dayIndex > 6)
                 throw new ArgumentOutOfRangeException(nameof(dayIndex));
@@ -118,35 +168,30 @@ namespace RecipePlanner.UI.Controls {
             return (DayOfWeek)(((int)DayOfWeek.Monday + dayIndex) % 7);
         }
 
-        private void RecipesSelector_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e) {
-
-            if (_dayContext == null)
-                return;
-
-            if (_dayContext.SelectedRecipeId.HasValue) {
-                foreach (DataGridViewRow row in RecipesSelector.Rows) {
-                    if (row.DataBoundItem is RecipeChoiceItem item) {
-                        if (item.Id == _dayContext.SelectedRecipeId.Value) {
-                            row.Selected = true;
-                            RecipesSelector.CurrentCell = row.Cells[0];
-                            break;
-                        }
-                    }
-                }
-                SetSelectedRecipeId();
-            }
-            else
-                ClearSelection();
-
-
-            _isBinding = false; ;
-        }
-
         private void ClearSelection() {
             RecipesSelector.ClearSelection();
+            RecipesSelector.CurrentCell = null;
             _selectedRecipeId = null;
             SelectedRecipe.Text = string.Empty;
         }
+        public void SetSelectedRecipeId() {
+            if (RecipesSelector.SelectedRows.Count == 0) {
+                _selectedRecipeId = null;
+                SelectedRecipe.Text = string.Empty;
+                return;
+            }
+
+            var row = RecipesSelector.SelectedRows[0];
+            if (row.DataBoundItem is not RecipeChoiceItem item) {
+                _selectedRecipeId = null;
+                SelectedRecipe.Text = string.Empty;
+                return;
+            }
+
+            _selectedRecipeId = item.Id;
+            SelectedRecipe.Text = "Gekozen recept: " + item.Name;
+        }
+
 
         private void RecipesSelector_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e) {
             if (e.RowIndex < 0) return; // header
@@ -180,6 +225,8 @@ namespace RecipePlanner.UI.Controls {
 
             SelectedRecipeChanged?.Invoke(this, EventArgs.Empty);
         }
+
+
     }
 
 }

@@ -278,7 +278,7 @@
             RecipesButton.TabIndex = 5;
             RecipesButton.Text = "Recipes";
             RecipesButton.UseVisualStyleBackColor = true;
-            RecipesButton.Click += RecipesButton_Click;
+            RecipesButton.Click += RecipesButton_ClickAsync;
             // 
             // IngredientsButton
             // 
@@ -302,7 +302,7 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "My Recipe Planner";
-            Load += MainForm_Load;
+            Load += MainForm_LoadAsync;
             panel4.ResumeLayout(false);
             BottomDaysPanel.ResumeLayout(false);
             Sunday.ResumeLayout(false);

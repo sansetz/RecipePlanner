@@ -15,9 +15,9 @@ namespace RecipePlanner.UI {
         }
 
         private async void frmRecipes_LoadAsync(object sender, EventArgs e) {
-            await LoadRecipesAsync();
-
             RecipesListView.SetColumnConfiguration(ExtraGridConfig);
+
+            await LoadRecipesAsync();
 
             RecipesListView.AddClicked += RecipesListView_AddClickedAsync;
             RecipesListView.UpdateClicked += RecipesListView_UpdateClickedAsync;

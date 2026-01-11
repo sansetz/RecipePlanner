@@ -112,9 +112,9 @@
             label3.AutoSize = true;
             label3.Location = new Point(36, 188);
             label3.Name = "label3";
-            label3.Size = new Size(151, 32);
+            label3.Size = new Size(324, 32);
             label3.TabIndex = 13;
-            label3.Text = "Ingredienten";
+            label3.Text = "Aan te schaffen ingredienten";
             // 
             // RecipeEditForm
             // 
