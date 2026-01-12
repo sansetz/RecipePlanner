@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RecipePlanner.Contracts.GroceryList;
 using RecipePlanner.Contracts.Ingredient;
 using RecipePlanner.Contracts.PlannedDay;
 using RecipePlanner.Contracts.Recipe;
@@ -38,6 +39,11 @@ namespace RecipePlanner.Data {
         Task<int> AddPlannedDayAsync(int weekplanId, DateOnly date, PrepTime availablePrepTime, int? recipeId, CancellationToken ct = default);
         Task UpdatePlannedDayAsync(int id, PrepTime availablePrepTime, int? recipeId, CancellationToken ct = default);
 
+
+        //Task<List<GroceryListItem>> GetGroceryListItemsForWeekAsync(DateOnly weekStartDate, CancellationToken ct = default);
+        Task<List<int>> GetRecipeIdsForWeekAsync(DateOnly weekStartDate, CancellationToken ct = default);
+        Task<List<GroceryListItem>> GetGroceryListItemsForRecipesAsync(List<int> recipeIds, CancellationToken ct = default);
+
         Task SaveSeedDataAsync(CancellationToken ct = default);
 
     }
@@ -50,9 +56,61 @@ namespace RecipePlanner.Data {
         }
 
 
+        //**************** Grocery List ****************
+
+        //public async Task<List<GroceryListItem>> GetGroceryListItemsForWeekAsync(DateOnly weekStartDate, CancellationToken ct = default) {
+
+
+        //}
+
+        public async Task<List<GroceryListItem>> GetGroceryListItemsForRecipesAsync(
+            List<int> recipeIds,
+            CancellationToken ct = default
+        ) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.RecipeIngredients
+                .AsNoTracking()
+                .Where(ri => recipeIds.Contains(ri.RecipeId))
+                .GroupBy(ri => new {
+                    ri.IngredientId,
+                    IngredientName = ri.Ingredient.Name,
+                    UnitName = ri.Unit.Name,
+                    CountForOverlap = ri.Ingredient.CountForOverlap
+                })
+                .Select(g => new {
+                    g.Key.IngredientId,
+                    g.Key.IngredientName,
+                    TotalQuantity = g.Sum(x => x.Quantity),
+                    g.Key.UnitName,
+                    g.Key.CountForOverlap
+                })
+                .OrderByDescending(x => x.CountForOverlap)
+                .ThenBy(x => x.IngredientName)
+                .Select(x => new GroceryListItem(
+                    x.IngredientId,
+                    x.IngredientName,
+                    x.TotalQuantity,
+                    x.UnitName,
+                    x.CountForOverlap
+                ))
+                .ToListAsync(ct);
+        }
+        public async Task<List<int>> GetRecipeIdsForWeekAsync(DateOnly weekStartDate, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.PlannedDays
+                .AsNoTracking()
+                .Where(pd => pd.Weekplan.WeekStartDate == weekStartDate)
+                .Where(pd => pd.RecipeId != null)
+                .Select(pd => pd.RecipeId!.Value)
+                .Distinct()
+                .ToListAsync(ct);
+
+
+        }
+
         //**************** Weekplan ********************
-
-
         public async Task<Weekplan?> GetWeekplanByIdAsync(int id, CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 

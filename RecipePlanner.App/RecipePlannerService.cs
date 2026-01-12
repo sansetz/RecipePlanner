@@ -1,4 +1,5 @@
-﻿using RecipePlanner.Contracts.Ingredient;
+﻿using RecipePlanner.Contracts.GroceryList;
+using RecipePlanner.Contracts.Ingredient;
 using RecipePlanner.Contracts.PlannedDay;
 using RecipePlanner.Contracts.Recipe;
 using RecipePlanner.Contracts.RecipeIngredient;
@@ -13,10 +14,22 @@ namespace RecipePlanner.App {
             _storage = storage;
         }
 
+        // **************** Grocery List *************
+
+        public async Task<List<GroceryListItem>> GetGroceryListItemsForWeekAsync(
+            DateOnly weekStartDate,
+            CancellationToken ct = default
+        ) {
+            var recipeIds = await _storage.GetRecipeIdsForWeekAsync(weekStartDate, ct);
+            if (recipeIds.Count == 0)
+                return [];
+
+            return await _storage.GetGroceryListItemsForRecipesAsync(recipeIds, ct);
+        }
+
+
+
         // **************** Weekplan *****************
-
-
-
 
         public async Task<Weekplan> GetOrCreateWeekplanAsync(DateOnly weekStartDate, CancellationToken ct = default) {
             var weekplan = await _storage.GetWeekplanWithDaysByStartdateAsync(weekStartDate, ct);

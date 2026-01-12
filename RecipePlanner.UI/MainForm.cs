@@ -55,10 +55,10 @@ namespace RecipePlanner {
             await LoadRecipesAsync();
             RefreshPickers();
         }
-        private void ShoppingList_Click(object sender, EventArgs e) {
+        private async void ShoppingList_ClickAsync(object sender, EventArgs e) {
             using var scope = _scopeFactory.CreateScope();
-            var frm = scope.ServiceProvider.GetRequiredService<ShoppingListForm>();
-            frm.ShowDialog(this);
+            var frm = scope.ServiceProvider.GetRequiredService<GroceryListForm>();
+            await frm.ShowDialogForCreateAsync(_currentWeekStartDate, this);
         }
 
         private void Exit_Click(object sender, EventArgs e) {
@@ -129,7 +129,6 @@ namespace RecipePlanner {
                 _selectedRecipeIdByDay[dayIndex] = plannedDay.RecipeId;
             }
 
-            // 4) Laat je bestaande UI-refresh het werk doen
             RefreshPickers();
         }
 

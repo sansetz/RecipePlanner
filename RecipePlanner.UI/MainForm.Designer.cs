@@ -290,7 +290,7 @@
             ShoppingList.TabIndex = 9;
             ShoppingList.Text = "Boodschappenlijstje";
             ShoppingList.UseVisualStyleBackColor = true;
-            ShoppingList.Click += ShoppingList_Click;
+            ShoppingList.Click += ShoppingList_ClickAsync;
             // 
             // RecipesButton
             // 
