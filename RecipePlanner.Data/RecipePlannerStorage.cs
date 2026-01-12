@@ -29,6 +29,15 @@ namespace RecipePlanner.Data {
         Task DeleteRecipeIngredientAsync(int recipeIngredientId, CancellationToken ct = default);
 
 
+        Task<Weekplan?> GetWeekplanByIdAsync(int id, CancellationToken ct = default);
+        Task<Weekplan?> GetWeekplanWithDaysByIdAsync(int id, CancellationToken ct = default);
+        Task<Weekplan?> GetWeekplanWithDaysByStartdateAsync(DateOnly weekStartDate, CancellationToken ct = default);
+        Task<int> AddWeekplanAsync(DateOnly weekStartDate, CancellationToken ct = default);
+        Task<PlannedDay?> GetPlannedDayByIdAsync(int id, CancellationToken ct = default);
+        Task<PlannedDay?> GetPlannedDayByWeekplanAndDateAsync(int weekplanId, DateOnly date, CancellationToken ct = default);
+        Task<int> AddPlannedDayAsync(int weekplanId, DateOnly date, PrepTime availablePrepTime, int? recipeId, CancellationToken ct = default);
+        Task UpdatePlannedDayAsync(int id, PrepTime availablePrepTime, int? recipeId, CancellationToken ct = default);
+
         Task SaveSeedDataAsync(CancellationToken ct = default);
 
     }
@@ -41,13 +50,106 @@ namespace RecipePlanner.Data {
         }
 
 
+        //**************** Weekplan ********************
 
+
+        public async Task<Weekplan?> GetWeekplanByIdAsync(int id, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.Weekplans
+                .AsNoTracking()
+                .FirstOrDefaultAsync(wp => wp.Id == id, ct);
+        }
+        public async Task<Weekplan?> GetWeekplanWithDaysByIdAsync(int id, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.Weekplans
+                .AsNoTracking()
+                .Include(wp => wp.PlannedDays)
+                .ThenInclude(pd => pd.Recipe)
+                .FirstOrDefaultAsync(wp => wp.Id == id, ct);
+        }
+
+        public async Task<Weekplan?> GetWeekplanWithDaysByStartdateAsync(DateOnly weekStartDate, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.Weekplans
+                .AsNoTracking()
+                .Include(wp => wp.PlannedDays)
+                .ThenInclude(pd => pd.Recipe)
+                .FirstOrDefaultAsync(wp => wp.WeekStartDate == weekStartDate, ct);
+        }
+
+
+        public async Task<int> AddWeekplanAsync(DateOnly weekStartDate, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            var weekplan = new Weekplan { WeekStartDate = weekStartDate };
+            db.Weekplans.Add(weekplan);
+            await db.SaveChangesAsync(ct);
+
+            return weekplan.Id;
+        }
+
+
+
+        //no update needed because makes no sense. New start date is new week. Update is only done through PlannedDays
+
+        public async Task<PlannedDay?> GetPlannedDayByIdAsync(int id, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.PlannedDays
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == id, ct);
+        }
+        public async Task<PlannedDay?> GetPlannedDayByWeekplanAndDateAsync(
+            int weekplanId,
+            DateOnly date,
+            CancellationToken ct = default
+        ) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.PlannedDays
+                .AsNoTracking()
+                .FirstOrDefaultAsync(pd => pd.WeekplanId == weekplanId && pd.Date == date, ct);
+        }
+
+
+        public async Task<int> AddPlannedDayAsync(int weekplanId, DateOnly date, PrepTime availablePrepTime, int? recipeId, CancellationToken ct = default) {
+
+            await using var db = _factory.CreateDbContext();
+
+            var plannedDay = new PlannedDay {
+                WeekplanId = weekplanId,
+                Date = date,
+                AvailablePrepTime = availablePrepTime,
+                RecipeId = recipeId
+            };
+            db.PlannedDays.Add(plannedDay);
+            await db.SaveChangesAsync(ct);
+
+            return plannedDay.Id;
+        }
+
+        public async Task UpdatePlannedDayAsync(int id, PrepTime availablePrepTime, int? recipeId, CancellationToken ct = default) {
+
+            await using var db = _factory.CreateDbContext();
+
+            var plannedDay = await db.PlannedDays.FindAsync([id], ct);
+            if (plannedDay is null)
+                throw new InvalidOperationException($"PlannedDay with id {id} not available in DB");
+
+            plannedDay.AvailablePrepTime = availablePrepTime;
+            plannedDay.RecipeId = recipeId;
+
+            await db.SaveChangesAsync(ct);
+        }
 
 
 
         // ***************** Units *****************
         public async Task<List<Unit>> GetAllUnitsAsync(CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
+            await using var db = _factory.CreateDbContext();
 
             return await db.Units
                 .AsNoTracking()
@@ -58,7 +160,7 @@ namespace RecipePlanner.Data {
 
         // ***************** Ingredients *****************
         public async Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
+            await using var db = _factory.CreateDbContext();
 
             return await db.Ingredients
                 .AsNoTracking()
@@ -73,7 +175,7 @@ namespace RecipePlanner.Data {
         }
 
         public async Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
+            await using var db = _factory.CreateDbContext();
 
             return await db.Ingredients
                 .AsNoTracking()
@@ -95,7 +197,7 @@ namespace RecipePlanner.Data {
 
             var ingredient = await db.Ingredients.FindAsync([id], ct);
             if (ingredient is null)
-                throw new InvalidOperationException("Ingredient not available in DB");
+                throw new InvalidOperationException($"Ingredient with id {id} not available in DB");
 
             ingredient.Name = name;
             ingredient.DefaultUnitId = defaultUnitId;
@@ -108,7 +210,7 @@ namespace RecipePlanner.Data {
 
             var ingredient = await db.Ingredients.FindAsync([id], ct);
             if (ingredient is null)
-                throw new InvalidOperationException("Ingredient not available in DB");
+                throw new InvalidOperationException($"Ingredient with id {id} not available in DB");
 
             db.Ingredients.Remove(ingredient);
 
@@ -117,7 +219,7 @@ namespace RecipePlanner.Data {
 
         // ***************** Recipes *****************
         public async Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
+            await using var db = _factory.CreateDbContext();
 
             return await db.Recipes
                 .AsNoTracking()
@@ -131,7 +233,7 @@ namespace RecipePlanner.Data {
             .ToListAsync(ct);
         }
         public async Task<Recipe?> GetRecipeByIdAsync(int id, CancellationToken ct = default) {
-            using var db = _factory.CreateDbContext();
+            await using var db = _factory.CreateDbContext();
 
             return await db.Recipes
                 .AsNoTracking()
@@ -153,7 +255,7 @@ namespace RecipePlanner.Data {
 
             var recipe = await db.Recipes.FindAsync([id], ct);
             if (recipe is null)
-                throw new InvalidOperationException("Recipe not available in DB");
+                throw new InvalidOperationException($"Recipe with id {id} not available in DB");
 
             recipe.Name = name;
             recipe.PrepTime = preptime;
@@ -166,7 +268,7 @@ namespace RecipePlanner.Data {
 
             var recipe = await db.Recipes.FindAsync([id], ct);
             if (recipe is null)
-                throw new InvalidOperationException("Recipe not available in DB");
+                throw new InvalidOperationException($"Recipe with id {id} not available in DB");
 
             db.Recipes.Remove(recipe);
 
@@ -264,7 +366,7 @@ namespace RecipePlanner.Data {
 
             var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeIngredientId], ct);
             if (recipeIngredient is null)
-                throw new InvalidOperationException("RecipeIngredient not available in DB");
+                throw new InvalidOperationException($"RecipeIngredient with id {recipeIngredientId} not available in DB");
 
             recipeIngredient.IngredientId = ingredientId;
             recipeIngredient.UnitId = unitId;
@@ -278,7 +380,7 @@ namespace RecipePlanner.Data {
 
             var recipeIngredient = await db.RecipeIngredients.FindAsync([recipeIngredientId], ct);
             if (recipeIngredient is null)
-                throw new InvalidOperationException("RecipeIngredient not available in DB");
+                throw new InvalidOperationException($"RecipeIngredient with id {recipeIngredientId} not available in DB");
 
             db.RecipeIngredients.Remove(recipeIngredient);
             await db.SaveChangesAsync(ct);
@@ -289,7 +391,7 @@ namespace RecipePlanner.Data {
         // ***************** Seed Data *****************
         public async Task SaveSeedDataAsync(CancellationToken ct = default) {
 
-            using var db = _factory.CreateDbContext();
+            await using var db = _factory.CreateDbContext();
 
             // Voorkom dubbel seeden: als er al recepten zijn, stoppen.
             if (db.Recipes.Any()) {

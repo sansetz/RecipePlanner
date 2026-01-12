@@ -16,7 +16,8 @@ namespace RecipePlanner {
             // - typing in combobox for selecting ingredients/recipes does not work correctly, can only type first letter
             // - print shoppinglist
             // - hover over recipes shows overlap ingredients
-            //
+            // - save planned week + option to select week
+
 
             ApplicationConfiguration.Initialize();
 
@@ -30,6 +31,7 @@ namespace RecipePlanner {
             services.AddTransient<IngredientEditForm>();
             services.AddTransient<RecipeEditForm>();
             services.AddTransient<RecipeIngredientEditForm>();
+            services.AddTransient<ShoppingListForm>();
 
             using var serviceProvider = services.BuildServiceProvider();
             var mainForm = serviceProvider.GetRequiredService<MainForm>();

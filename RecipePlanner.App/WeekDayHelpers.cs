@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 
 namespace RecipePlanner.App {
-    public static class WeekDayHelper {
+    public static class WeekDayHelpers {
 
         public static string GetDayName(DayOfWeek dayOfWeek) {
             var cultureInfo = new CultureInfo("nl-NL");
@@ -17,6 +17,12 @@ namespace RecipePlanner.App {
             // Planner:   Monday = 0, Tuesday = 1, ...
             return (DayOfWeek)(((int)DayOfWeek.Monday + dayIndex) % 7);
         }
+        public static DateOnly GetWeekStart(DateOnly date) {
+            int offset = date.DayOfWeek == DayOfWeek.Sunday
+                ? 6
+                : (int)date.DayOfWeek - (int)DayOfWeek.Monday;
 
+            return date.AddDays(-offset);
+        }
     }
 }

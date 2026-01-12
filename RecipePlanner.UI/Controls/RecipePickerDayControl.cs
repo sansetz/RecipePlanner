@@ -100,7 +100,7 @@ namespace RecipePlanner.UI.Controls {
             _isBinding = true;
             _dayContext = daycontext;
 
-            DayTitle.Text = WeekDayHelper.GetDayName(WeekDayHelper.ToDayOfWeek(daycontext.DayIndex));
+            DayTitle.Text = WeekDayHelpers.GetDayName(WeekDayHelpers.ToDayOfWeek(daycontext.DayIndex));
             LoadRecipes();
         }
 

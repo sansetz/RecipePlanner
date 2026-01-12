@@ -49,6 +49,8 @@
             Monday = new Panel();
             MondayRecipePicker = new RecipePlanner.UI.Controls.RecipePickerDayControl();
             MenuPanel = new Panel();
+            StartDatePicker = new DateTimePicker();
+            ShoppingList = new Button();
             RecipesButton = new Button();
             IngredientsButton = new Button();
             panel4.SuspendLayout();
@@ -261,6 +263,8 @@
             // MenuPanel
             // 
             MenuPanel.BackColor = Color.Black;
+            MenuPanel.Controls.Add(StartDatePicker);
+            MenuPanel.Controls.Add(ShoppingList);
             MenuPanel.Controls.Add(Exit);
             MenuPanel.Controls.Add(RecipesButton);
             MenuPanel.Controls.Add(IngredientsButton);
@@ -270,9 +274,27 @@
             MenuPanel.Size = new Size(2373, 102);
             MenuPanel.TabIndex = 10;
             // 
+            // StartDatePicker
+            // 
+            StartDatePicker.Location = new Point(34, 27);
+            StartDatePicker.Name = "StartDatePicker";
+            StartDatePicker.Size = new Size(458, 39);
+            StartDatePicker.TabIndex = 10;
+            StartDatePicker.ValueChanged += StartDatePicker_ValueChangedAsync;
+            // 
+            // ShoppingList
+            // 
+            ShoppingList.Location = new Point(1015, 19);
+            ShoppingList.Name = "ShoppingList";
+            ShoppingList.Size = new Size(270, 62);
+            ShoppingList.TabIndex = 9;
+            ShoppingList.Text = "Boodschappenlijstje";
+            ShoppingList.UseVisualStyleBackColor = true;
+            ShoppingList.Click += ShoppingList_Click;
+            // 
             // RecipesButton
             // 
-            RecipesButton.Location = new Point(337, 19);
+            RecipesButton.Location = new Point(1605, 19);
             RecipesButton.Name = "RecipesButton";
             RecipesButton.Size = new Size(248, 62);
             RecipesButton.TabIndex = 5;
@@ -282,7 +304,7 @@
             // 
             // IngredientsButton
             // 
-            IngredientsButton.Location = new Point(32, 19);
+            IngredientsButton.Location = new Point(1318, 19);
             IngredientsButton.Name = "IngredientsButton";
             IngredientsButton.Size = new Size(281, 62);
             IngredientsButton.TabIndex = 4;
@@ -342,5 +364,7 @@
         private UI.Controls.RecipePickerDayControl SaturdayRecipePicker;
         private Panel Friday;
         private UI.Controls.RecipePickerDayControl FridayRecipePicker;
+        private Button ShoppingList;
+        private DateTimePicker StartDatePicker;
     }
 }

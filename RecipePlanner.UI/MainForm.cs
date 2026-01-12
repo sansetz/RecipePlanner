@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using RecipePlanner.App;
 using RecipePlanner.Contracts.PlannedDay;
+using RecipePlanner.Contracts.Recipe;
 using RecipePlanner.Data;
 using RecipePlanner.UI;
 using RecipePlanner.UI.Controls;
@@ -20,6 +21,9 @@ namespace RecipePlanner {
 
         private bool _isRefreshingPickers = false;
 
+        private DateOnly _currentWeekStartDate;
+
+        private const PrepTime DUMMY_PREPTIME = PrepTime.Medium; //todo: replace with field in picker control (does not exist yet)
 
         public MainForm(IServiceScopeFactory scopeFactory, IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
             InitializeComponent();
@@ -51,6 +55,11 @@ namespace RecipePlanner {
             await LoadRecipesAsync();
             RefreshPickers();
         }
+        private void ShoppingList_Click(object sender, EventArgs e) {
+            using var scope = _scopeFactory.CreateScope();
+            var frm = scope.ServiceProvider.GetRequiredService<ShoppingListForm>();
+            frm.ShowDialog(this);
+        }
 
         private void Exit_Click(object sender, EventArgs e) {
             Close();
@@ -68,14 +77,14 @@ namespace RecipePlanner {
 
         private void InitRecipePickers() {
             for (int i = 0; i < 7; i++) {
-                _recipePickers[i].SelectedRecipeChanged += RecipePicker_SelectedRecipeChanged;
+                _recipePickers[i].SelectedRecipeChanged += RecipePicker_SelectedRecipeChangedAsync;
 
                 var context = BuildDayContext(i);
                 _recipePickers[i].SetContext(context);
             }
         }
 
-        private void RecipePicker_SelectedRecipeChanged(object? sender, EventArgs e) {
+        private async void RecipePicker_SelectedRecipeChangedAsync(object? sender, EventArgs e) {
             if (_isRefreshingPickers)
                 return;
 
@@ -85,10 +94,43 @@ namespace RecipePlanner {
 
             int dayIndex = _recipePickers.IndexOf(recipePicker);
 
+            var date = _currentWeekStartDate.AddDays(dayIndex);
+            var availablePrepTime = DUMMY_PREPTIME;
+
+            await _recipePlannerService.SetPlannedDayAsync(
+                _currentWeekStartDate,
+                date,
+                availablePrepTime,
+                recipePicker.SelectedRecipeId,
+                ct: default
+            );
+            await ReloadSelectedRecipesForCurrentWeekAsync();
+
             _selectedRecipeIdByDay[dayIndex] = recipePicker.SelectedRecipeId;
+
             RefreshPickers();
+        }
 
+        private async Task ReloadSelectedRecipesForCurrentWeekAsync(CancellationToken ct = default) {
+            // 1) Haal weekplan + planned days op
+            var weekplan = await _recipePlannerService.GetOrCreateWeekplanAsync(_currentWeekStartDate, ct);
 
+            // 2) Reset de UI-state (7 dagen)
+            for (int i = 0; i < 7; i++)
+                _selectedRecipeIdByDay[i] = null;
+
+            // 3) Zet geplande recepten terug op de juiste dagindex (0..6)
+            foreach (var plannedDay in weekplan.PlannedDays) {
+                int dayIndex = plannedDay.Date.DayNumber - _currentWeekStartDate.DayNumber;
+
+                if (dayIndex < 0 || dayIndex > 6)
+                    continue; // safety: hoort niet te gebeuren als week klopt
+
+                _selectedRecipeIdByDay[dayIndex] = plannedDay.RecipeId;
+            }
+
+            // 4) Laat je bestaande UI-refresh het werk doen
+            RefreshPickers();
         }
 
         private void RefreshPickers() {
@@ -148,7 +190,7 @@ namespace RecipePlanner {
                 .GroupBy(kv => kv.Value!.Value)
                 .ToDictionary(
                     g => g.Key,
-                    g => WeekDayHelper.GetDayName(WeekDayHelper.ToDayOfWeek(g.First().Key))
+                    g => WeekDayHelpers.GetDayName(WeekDayHelpers.ToDayOfWeek(g.First().Key))
                 );
 
             var recipesForDay = _allRecipes
@@ -190,6 +232,13 @@ namespace RecipePlanner {
                 .Where(kv => kv.Key != dayIndex && kv.Value.HasValue)
                 .Select(kv => kv.Value!.Value)
                 .ToHashSet();
+        }
+
+        private async void StartDatePicker_ValueChangedAsync(object sender, EventArgs e) {
+            var chosen = DateOnly.FromDateTime(StartDatePicker.Value);
+            _currentWeekStartDate = WeekDayHelpers.GetWeekStart(chosen);
+
+            await ReloadSelectedRecipesForCurrentWeekAsync();
         }
     }
 }
