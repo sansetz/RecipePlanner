@@ -5,6 +5,7 @@
     public sealed record RecipeSource(
         int Id,
         string Name,
+        string? InfoText,
         List<CountedIngredient> CountedIngredients
     );
 }

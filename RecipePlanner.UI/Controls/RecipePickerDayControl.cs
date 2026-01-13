@@ -169,6 +169,9 @@ namespace RecipePlanner.UI.Controls {
             if (item.HasOverlap && !string.IsNullOrWhiteSpace(item.OverlapIngredientsText)) {
                 e.ToolTipText = "Overlap door: " + item.OverlapIngredientsText;
             }
+
+            if (RecipesSelector.SelectedRows.Count > 0 && row == RecipesSelector.SelectedRows[0])
+                e.ToolTipText = "Info: " + item.InfoText;
         }
 
 

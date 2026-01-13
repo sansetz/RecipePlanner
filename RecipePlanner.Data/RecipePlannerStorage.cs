@@ -339,7 +339,7 @@ namespace RecipePlanner.Data {
             // 1) Basis recepten
             var recipes = await db.Recipes
                 .AsNoTracking()
-                .Select(r => new { r.Id, r.Name })
+                .Select(r => new { r.Id, r.Name, r.Info })
                 .ToListAsync(ct);
 
             // 2) Counted ingredients (plat) met naam
@@ -365,6 +365,7 @@ namespace RecipePlanner.Data {
                 .Select(r => new RecipeSource(
                     r.Id,
                     r.Name,
+                    r.Info,
                     countedByRecipeId.TryGetValue(r.Id, out var list) ? list : new List<CountedIngredient>()
                 ))
                 .ToList();

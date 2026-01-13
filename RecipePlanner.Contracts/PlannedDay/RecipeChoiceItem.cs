@@ -6,7 +6,8 @@
         int OverlapCount,
         bool UsedInOtherDays,
         string? OverlapIngredientsText,
-        string? UsedInDayName
+        string? UsedInDayName,
+        string? InfoText
     );
 
 }

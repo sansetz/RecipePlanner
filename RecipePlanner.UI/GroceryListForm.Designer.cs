@@ -28,9 +28,10 @@
             // 
             // GroceryList
             // 
-            GroceryList.Location = new Point(43, 35);
+            GroceryList.Font = new Font("Exo", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            GroceryList.Location = new Point(47, 38);
             GroceryList.Name = "GroceryList";
-            GroceryList.Size = new Size(723, 386);
+            GroceryList.Size = new Size(1083, 942);
             GroceryList.TabIndex = 0;
             GroceryList.Text = "";
             // 
@@ -38,7 +39,7 @@
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(1174, 1020);
             Controls.Add(GroceryList);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "GroceryListForm";

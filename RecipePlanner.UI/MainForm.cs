@@ -212,11 +212,13 @@ namespace RecipePlanner {
                         overlapList.Count,
                         chosenElsewhere.Contains(r.Id),
                         overlapText,
-                        usedDayName
+                        usedDayName,
+                        r.InfoText
                     );
                 })
                 .OrderByDescending(r => r.UsedInOtherDays)
                 .ThenByDescending(r => r.OverlapCount)
+                .ThenBy(r => r.Name)
                 .ToList();
 
             return new DayContext {
