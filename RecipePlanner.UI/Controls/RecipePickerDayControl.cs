@@ -128,7 +128,6 @@ namespace RecipePlanner.UI.Controls {
             RecipesSelector.ReadOnly = true;
 
             RecipesSelector.ShowCellToolTips = true;
-            RecipesSelector.CellToolTipTextNeeded += RecipesSelector_CellToolTipTextNeeded;
 
             RecipesSelector.EnableHeadersVisualStyles = false;
             RecipesSelector.ColumnHeadersDefaultCellStyle.SelectionBackColor =
@@ -233,7 +232,6 @@ namespace RecipePlanner.UI.Controls {
 
             SelectedRecipeChanged?.Invoke(this, EventArgs.Empty);
         }
-
 
     }
 

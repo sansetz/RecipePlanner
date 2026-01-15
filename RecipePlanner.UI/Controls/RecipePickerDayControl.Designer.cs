@@ -24,24 +24,24 @@
         /// </summary>
         private void InitializeComponent() {
             ControlPanel = new Panel();
+            RecipesSelector = new DataGridView();
             InfoPanel = new Panel();
             SelectedRecipe = new Label();
-            RecipesSelector = new DataGridView();
             ToolbarPanel = new Panel();
             label1 = new Label();
             TitlePanel = new Panel();
             DayTitle = new Label();
             ControlPanel.SuspendLayout();
-            InfoPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)RecipesSelector).BeginInit();
+            InfoPanel.SuspendLayout();
             ToolbarPanel.SuspendLayout();
             TitlePanel.SuspendLayout();
             SuspendLayout();
             // 
             // ControlPanel
             // 
-            ControlPanel.Controls.Add(InfoPanel);
             ControlPanel.Controls.Add(RecipesSelector);
+            ControlPanel.Controls.Add(InfoPanel);
             ControlPanel.Controls.Add(ToolbarPanel);
             ControlPanel.Controls.Add(TitlePanel);
             ControlPanel.Dock = DockStyle.Fill;
@@ -50,6 +50,25 @@
             ControlPanel.Padding = new Padding(10);
             ControlPanel.Size = new Size(603, 735);
             ControlPanel.TabIndex = 0;
+            // 
+            // RecipesSelector
+            // 
+            RecipesSelector.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            RecipesSelector.ColumnHeadersVisible = false;
+            RecipesSelector.Dock = DockStyle.Fill;
+            RecipesSelector.EnableHeadersVisualStyles = false;
+            RecipesSelector.Location = new Point(10, 158);
+            RecipesSelector.Name = "RecipesSelector";
+            RecipesSelector.RowHeadersVisible = false;
+            RecipesSelector.RowHeadersWidth = 82;
+            RecipesSelector.Size = new Size(583, 524);
+            RecipesSelector.TabIndex = 5;
+            RecipesSelector.CellFormatting += RecipesSelector_CellFormatting;
+            RecipesSelector.CellMouseDown += RecipesSelector_CellMouseDown;
+            RecipesSelector.CellMouseUp += RecipesSelector_CellMouseUp;
+            RecipesSelector.CellToolTipTextNeeded += RecipesSelector_CellToolTipTextNeeded;
+            RecipesSelector.DataBindingComplete += RecipesSelector_DataBindingComplete;
+            RecipesSelector.SelectionChanged += RecipesSelector_SelectionChanged;
             // 
             // InfoPanel
             // 
@@ -70,24 +89,6 @@
             SelectedRecipe.Size = new Size(78, 32);
             SelectedRecipe.TabIndex = 0;
             SelectedRecipe.Text = "label2";
-            // 
-            // RecipesSelector
-            // 
-            RecipesSelector.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            RecipesSelector.ColumnHeadersVisible = false;
-            RecipesSelector.Dock = DockStyle.Fill;
-            RecipesSelector.EnableHeadersVisualStyles = false;
-            RecipesSelector.Location = new Point(10, 158);
-            RecipesSelector.Name = "RecipesSelector";
-            RecipesSelector.RowHeadersVisible = false;
-            RecipesSelector.RowHeadersWidth = 82;
-            RecipesSelector.Size = new Size(583, 567);
-            RecipesSelector.TabIndex = 3;
-            RecipesSelector.CellFormatting += RecipesSelector_CellFormatting;
-            RecipesSelector.CellMouseDown += RecipesSelector_CellMouseDown;
-            RecipesSelector.CellMouseUp += RecipesSelector_CellMouseUp;
-            RecipesSelector.DataBindingComplete += RecipesSelector_DataBindingComplete;
-            RecipesSelector.SelectionChanged += RecipesSelector_SelectionChanged;
             // 
             // ToolbarPanel
             // 
@@ -140,9 +141,9 @@
             Name = "RecipePickerDayControl";
             Size = new Size(603, 735);
             ControlPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)RecipesSelector).EndInit();
             InfoPanel.ResumeLayout(false);
             InfoPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)RecipesSelector).EndInit();
             ToolbarPanel.ResumeLayout(false);
             ToolbarPanel.PerformLayout();
             TitlePanel.ResumeLayout(false);
@@ -152,12 +153,12 @@
         #endregion
 
         private Panel ControlPanel;
-        private DataGridView RecipesSelector;
         private Panel ToolbarPanel;
         private Panel TitlePanel;
         private Label DayTitle;
         private Label label1;
         private Panel InfoPanel;
         private Label SelectedRecipe;
+        private DataGridView RecipesSelector;
     }
 }
