@@ -6,12 +6,12 @@ namespace RecipePlanner.UI {
 
     public partial class RecipesForm : Form {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly RecipePlannerService _recipePlannerService;
+        private readonly RecipeService _recipeService;
 
-        public RecipesForm(IServiceScopeFactory scopeFactory, RecipePlannerService recipePlannerService) {
+        public RecipesForm(IServiceScopeFactory scopeFactory, RecipeService recipeService) {
             InitializeComponent();
             _scopeFactory = scopeFactory;
-            _recipePlannerService = recipePlannerService;
+            _recipeService = recipeService;
         }
 
         private async void frmRecipes_LoadAsync(object sender, EventArgs e) {
@@ -69,7 +69,7 @@ namespace RecipePlanner.UI {
                 if (recipeId == null)
                     return;
 
-                await _recipePlannerService.DeleteRecipeAsync(recipeId.Value);
+                await _recipeService.DeleteRecipeAsync(recipeId.Value);
                 await LoadRecipesAsync();
             }
             catch (Exception ex) {
@@ -89,7 +89,7 @@ namespace RecipePlanner.UI {
         }
 
         private async Task LoadRecipesAsync() {
-            var recipes = await _recipePlannerService.GetAllRecipesAsync();
+            var recipes = await _recipeService.GetAllRecipesAsync();
             RecipesListView.BindData(recipes);
         }
         private void ExtraGridConfig(DataGridView grid) {

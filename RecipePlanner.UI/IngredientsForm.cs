@@ -5,12 +5,12 @@ using RecipePlanner.Contracts.Ingredient;
 namespace RecipePlanner.UI {
     public partial class IngredientsForm : Form {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly RecipePlannerService _recipePlannerService;
+        private readonly IngredientService _ingredientService;
 
-        public IngredientsForm(IServiceScopeFactory scopeFactory, RecipePlannerService recipePlannerService) {
+        public IngredientsForm(IServiceScopeFactory scopeFactory, IngredientService ingredientService) {
             InitializeComponent();
             _scopeFactory = scopeFactory;
-            _recipePlannerService = recipePlannerService;
+            _ingredientService = ingredientService;
         }
         private async void IngredientsForm_LoadAsync(object sender, EventArgs e) {
             IngredientsListView.SetColumnConfiguration(ExtraGridConfig);
@@ -66,7 +66,7 @@ namespace RecipePlanner.UI {
                 if (ingredientId == null)
                     return;
 
-                await _recipePlannerService.DeleteIngredientAsync(ingredientId.Value);
+                await _ingredientService.DeleteIngredientAsync(ingredientId.Value);
                 await LoadIngredientsAsync();
             }
             catch (Exception ex) {
@@ -86,7 +86,7 @@ namespace RecipePlanner.UI {
         }
 
         private async Task LoadIngredientsAsync() {
-            var ingredients = await _recipePlannerService.GetAllIngredientsAsync();
+            var ingredients = await _ingredientService.GetAllIngredientsAsync();
             IngredientsListView.BindData(ingredients);
         }
         private void ExtraGridConfig(DataGridView grid) {

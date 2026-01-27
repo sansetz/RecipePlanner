@@ -21,7 +21,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RecipePlanner.Contracts\RecipePlanner.Contracts.csproj" />
-    <ProjectReference Include="..\RecipePlanner.Domain\RecipePlanner.Entities.csproj" />
     <ProjectReference Include="..\RecipePlanner.Entities\RecipePlanner.Entities.csproj" />
   </ItemGroup>
 

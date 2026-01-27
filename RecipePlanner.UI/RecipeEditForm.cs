@@ -6,18 +6,21 @@ using RecipePlanner.Contracts.RecipeIngredient;
 namespace RecipePlanner.UI {
     public partial class RecipeEditForm : Form {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly RecipePlannerService _recipePlannerService;
+        private readonly RecipeService _recipeService;
+        private readonly RecipeIngredientService _recipeIngredientService;
 
         private int? _recipeId = null;
         private List<RecipeIngredientEditItem>? _recipeIngredients;
 
         public RecipeEditForm(
             IServiceScopeFactory scopeFactory,
-            RecipePlannerService recipePlannerService
+            RecipeService recipeService,
+            RecipeIngredientService recipeIngredientService
         ) {
             InitializeComponent();
             _scopeFactory = scopeFactory;
-            _recipePlannerService = recipePlannerService;
+            _recipeService = recipeService;
+            _recipeIngredientService = recipeIngredientService;
         }
 
         private void RecipeEditForm_Load(object sender, EventArgs e) {
@@ -45,7 +48,7 @@ namespace RecipePlanner.UI {
 
         public async Task ShowDialogForUpdateAsync(int recipeId, IWin32Window? owner = null) {
 
-            var recipe = await _recipePlannerService.GetRecipeByIdAsync(recipeId);
+            var recipe = await _recipeService.GetRecipeByIdAsync(recipeId);
 
             if (recipe == null)
                 throw new InvalidOperationException("Recipe not found in DB");
@@ -115,10 +118,10 @@ namespace RecipePlanner.UI {
         private async Task SaveRecipeToDB(string name, PrepTime preptime, string info) {
             //first create recipe
             if (_recipeId == null) {
-                _recipeId = await _recipePlannerService.CreateRecipeAsync(name, preptime, info);
+                _recipeId = await _recipeService.CreateRecipeAsync(name, preptime, info);
             }
             else {
-                await _recipePlannerService.UpdateRecipeAsync(_recipeId.Value, name, preptime, info);
+                await _recipeService.UpdateRecipeAsync(_recipeId.Value, name, preptime, info);
             }
 
             //sync ingredients
@@ -128,13 +131,13 @@ namespace RecipePlanner.UI {
             // Deleted eerst (voorkomt unique conflicts bij ingredient switch)
             foreach (var item in _recipeIngredients.Where(x => x.State == EditState.Deleted)) {
                 if (item.RecipeIngredientId != null) {
-                    await _recipePlannerService.DeleteRecipeIngredientAsync(item.RecipeIngredientId.Value);
+                    await _recipeIngredientService.DeleteRecipeIngredientAsync(item.RecipeIngredientId.Value);
                 }
             }
 
             // Added
             foreach (var item in _recipeIngredients.Where(x => x.State == EditState.Added)) {
-                var newId = await _recipePlannerService.CreateRecipeIngredientAsync(
+                var newId = await _recipeIngredientService.CreateRecipeIngredientAsync(
                     _recipeId.Value,
                     item.IngredientId,
                     item.UnitId,
@@ -149,7 +152,7 @@ namespace RecipePlanner.UI {
                 if (item.RecipeIngredientId == null)
                     throw new InvalidOperationException("Modified item without RecipeIngredientId.");
 
-                await _recipePlannerService.UpdateRecipeIngredientAsync(
+                await _recipeIngredientService.UpdateRecipeIngredientAsync(
                     item.RecipeIngredientId.Value,
                     item.IngredientId,
                     item.UnitId,
@@ -249,7 +252,7 @@ namespace RecipePlanner.UI {
             if (_recipeId == null)
                 throw new InvalidOperationException("Recipe ID is null.");
 
-            var rows = await _recipePlannerService.GetAllRecipeIngredientsAsync(_recipeId.Value);
+            var rows = await _recipeIngredientService.GetAllRecipeIngredientsAsync(_recipeId.Value);
 
             _recipeIngredients = rows.Select(r => new RecipeIngredientEditItem {
                 RecipeIngredientId = r.RecipeIngredientId,

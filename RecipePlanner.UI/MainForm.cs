@@ -2,15 +2,14 @@ using Microsoft.Extensions.DependencyInjection;
 using RecipePlanner.App;
 using RecipePlanner.Contracts.PlannedDay;
 using RecipePlanner.Contracts.Recipe;
-using RecipePlanner.Data;
 using RecipePlanner.UI;
 using RecipePlanner.UI.Controls;
 
 namespace RecipePlanner {
     public partial class MainForm : Form {
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IRecipePlannerDbContextFactory _dbFactory;
-        private readonly RecipePlannerService _recipePlannerService;
+        private readonly WeekplanService _weekplanService;
+        private readonly RecipeService _recipeService;
 
         private List<RecipePickerDayControl> _recipePickers = new List<RecipePickerDayControl>();
 
@@ -25,11 +24,15 @@ namespace RecipePlanner {
 
         private const PrepTime DUMMY_PREPTIME = PrepTime.Medium; //todo: replace with field in picker control (does not exist yet)
 
-        public MainForm(IServiceScopeFactory scopeFactory, IRecipePlannerDbContextFactory dbFactory, RecipePlannerService recipePlannerService) {
+        public MainForm(
+            IServiceScopeFactory scopeFactory,
+            WeekplanService weekplanService,
+            RecipeService recipeService
+        ) {
             InitializeComponent();
             _scopeFactory = scopeFactory;
-            _dbFactory = dbFactory;
-            _recipePlannerService = recipePlannerService;
+            _weekplanService = weekplanService;
+            _recipeService = recipeService;
         }
 
         private async void MainForm_LoadAsync(object sender, EventArgs e) {
@@ -55,6 +58,7 @@ namespace RecipePlanner {
             await LoadRecipesAsync();
             RefreshPickers();
         }
+
         private async void ShoppingList_ClickAsync(object sender, EventArgs e) {
             using var scope = _scopeFactory.CreateScope();
             var frm = scope.ServiceProvider.GetRequiredService<GroceryListForm>();
@@ -64,7 +68,6 @@ namespace RecipePlanner {
         private void Exit_Click(object sender, EventArgs e) {
             Close();
         }
-
         private void FillRecipePickersList() {
             _recipePickers.Add(MondayRecipePicker);
             _recipePickers.Add(TuesdayRecipePicker);
@@ -97,7 +100,7 @@ namespace RecipePlanner {
             var date = _currentWeekStartDate.AddDays(dayIndex);
             var availablePrepTime = DUMMY_PREPTIME;
 
-            await _recipePlannerService.SetPlannedDayAsync(
+            await _weekplanService.SetPlannedDayAsync(
                 _currentWeekStartDate,
                 date,
                 availablePrepTime,
@@ -113,7 +116,7 @@ namespace RecipePlanner {
 
         private async Task ReloadSelectedRecipesForCurrentWeekAsync(CancellationToken ct = default) {
             // 1) Haal weekplan + planned days op
-            var weekplan = await _recipePlannerService.GetOrCreateWeekplanAsync(_currentWeekStartDate, ct);
+            var weekplan = await _weekplanService.GetOrCreateWeekplanAsync(_currentWeekStartDate, ct);
 
             // 2) Reset de UI-state (7 dagen)
             for (int i = 0; i < 7; i++)
@@ -145,7 +148,7 @@ namespace RecipePlanner {
         }
 
         private async Task LoadRecipesAsync() {
-            _allRecipes = await _recipePlannerService.GetRecipeSourcesForPlanningAsync();
+            _allRecipes = await _recipeService.GetRecipeSourcesForPlanningAsync();
             _recipeById = _allRecipes.ToDictionary(r => r.Id);
         }
 

@@ -6,15 +6,18 @@ using RecipePlanner.Entities;
 namespace RecipePlanner.UI {
     public partial class RecipeIngredientEditForm : Form {
 
-        private readonly RecipePlannerService _recipePlannerService;
+        private readonly IngredientService _ingredientService;
+        private readonly UnitService _unitService;
         private List<RecipeIngredientEditItem>? _recipeIngredients;
         private Guid? _uiId = null; // null = create, value = update
 
         public RecipeIngredientEditForm(
-            RecipePlannerService recipePlannerService
+            IngredientService ingredientService,
+            UnitService unitService
         ) {
             InitializeComponent();
-            _recipePlannerService = recipePlannerService;
+            _ingredientService = ingredientService;
+            _unitService = unitService;
         }
 
         //adds new ingredient to the list of ingredients
@@ -137,7 +140,7 @@ namespace RecipePlanner.UI {
         }
 
         private async Task LoadIngredientAsync() {
-            var ingredients = await _recipePlannerService.GetAllIngredientsAsync();
+            var ingredients = await _ingredientService.GetAllIngredientsAsync();
             IngredientSelector.DisplayMember = nameof(IngredientListItem.Name);
             IngredientSelector.ValueMember = nameof(IngredientListItem.Id);
             IngredientSelector.DataSource = ingredients;
@@ -148,7 +151,7 @@ namespace RecipePlanner.UI {
 
         private async Task LoadUnitsAsync() {
 
-            var units = await _recipePlannerService.GetAllUnitsAsync();
+            var units = await _unitService.GetAllUnitsAsync();
             UnitSelector.DisplayMember = nameof(Unit.Name);
             UnitSelector.ValueMember = nameof(Unit.Id);
             UnitSelector.DataSource = units;

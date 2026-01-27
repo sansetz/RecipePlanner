@@ -4,14 +4,17 @@ using RecipePlanner.Entities;
 namespace RecipePlanner.UI {
     public partial class IngredientEditForm : Form {
 
-        private readonly RecipePlannerService _recipePlannerService;
+        private readonly IngredientService _ingredientService;
+        private readonly UnitService _unitService;
         private int? _ingredientId = null;
 
         public IngredientEditForm(
-            RecipePlannerService recipePlannerService
+            IngredientService ingredientService,
+            UnitService unitService
         ) {
             InitializeComponent();
-            _recipePlannerService = recipePlannerService;
+            _ingredientService = ingredientService;
+            _unitService = unitService;
         }
 
         public async Task ShowDialogForCreateAsync(IWin32Window? owner = null) {
@@ -28,7 +31,7 @@ namespace RecipePlanner.UI {
 
         public async Task ShowDialogForUpdateAsync(int ingredientId, IWin32Window? owner = null) {
 
-            var ingredient = await _recipePlannerService.GetIngredientByIdAsync(ingredientId);
+            var ingredient = await _ingredientService.GetIngredientByIdAsync(ingredientId);
 
             if (ingredient == null)
                 throw new InvalidOperationException("Ingredient not found in DB");
@@ -48,7 +51,7 @@ namespace RecipePlanner.UI {
 
         private async Task LoadUnitsAsync() {
 
-            var units = await _recipePlannerService.GetAllUnitsAsync();
+            var units = await _unitService.GetAllUnitsAsync();
             UnitSelector.DisplayMember = nameof(Unit.Name);
             UnitSelector.ValueMember = nameof(Unit.Id);
             UnitSelector.DataSource = units;
@@ -98,14 +101,14 @@ namespace RecipePlanner.UI {
         private async Task SaveIngredientToDB(string name, int unitId, bool countForOverlap) {
 
             if (_ingredientId == null) {
-                await _recipePlannerService.CreateIngredientAsync(
+                await _ingredientService.CreateIngredientAsync(
                     name,
                     unitId,
                     countForOverlap
                 );
             }
             else {
-                await _recipePlannerService.UpdateIngredientAsync(
+                await _ingredientService.UpdateIngredientAsync(
                     _ingredientId.Value,
                     name,
                     unitId,
