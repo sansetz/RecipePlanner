@@ -1,4 +1,6 @@
 ﻿using RecipePlanner.App;
+using RecipePlanner.Contracts.Filters;
+using RecipePlanner.Contracts.Ingredient;
 using RecipePlanner.Contracts.PlannedDay;
 
 namespace RecipePlanner.UI.Controls {
@@ -6,14 +8,24 @@ namespace RecipePlanner.UI.Controls {
 
         private int? _selectedRecipeId = null;
         private bool _isBinding = false;
+        private bool _isFilterBinding = false;
+
         private DayContext? _dayContext;
 
         private bool _pendingDeselect;
         private int _pendingRowIndex = -1;
 
+        private static readonly IngredientComboItem _allIngredientsItem = new(null, "<alle ingrediënten>");
+
         public int? SelectedRecipeId { get => _selectedRecipeId; }
 
         public event EventHandler? SelectedRecipeChanged;
+
+
+
+
+        public event FilterChangedEventHandler? FilterChanged;
+
 
         public RecipePickerDayControl() {
             InitializeComponent();
@@ -102,7 +114,41 @@ namespace RecipePlanner.UI.Controls {
 
             DayTitle.Text = WeekDayHelpers.GetDayName(WeekDayHelpers.ToDayOfWeek(daycontext.DayIndex));
             LoadRecipes();
+            ConfigFilter();
         }
+
+        private void ConfigFilter() {
+            if (_dayContext == null) return;
+
+            _isFilterBinding = true;
+            try {
+                var previous = IngredientsFilter.SelectedValue;
+
+                var comboItems = new List<IngredientComboItem>(_dayContext.FilterIngredients.Count + 1)
+                {
+                    _allIngredientsItem
+                };
+                comboItems.AddRange(_dayContext.FilterIngredients);
+
+                IngredientsFilter.DisplayMember = nameof(IngredientComboItem.Name);
+                IngredientsFilter.ValueMember = nameof(IngredientComboItem.Id);
+                IngredientsFilter.DataSource = comboItems;
+
+                // probeer vorige keuze te behouden
+
+                if (previous == null)
+                    IngredientsFilter.SelectedIndex = 0;
+                else
+                    IngredientsFilter.SelectedValue = previous;
+
+                if (IngredientsFilter.SelectedIndex < 0)
+                    IngredientsFilter.SelectedIndex = 0;
+            }
+            finally {
+                _isFilterBinding = false;
+            }
+        }
+
 
 
         private void LoadRecipes() {
@@ -113,8 +159,9 @@ namespace RecipePlanner.UI.Controls {
 
         private void InitialConfig() {
             this.Dock = DockStyle.Fill;
-            InitialConfigGrid();
             SelectedRecipe.Text = String.Empty;
+
+            InitialConfigGrid();
         }
 
         private void InitialConfigGrid() {
@@ -173,8 +220,6 @@ namespace RecipePlanner.UI.Controls {
                 e.ToolTipText = "Info: " + item.InfoText;
         }
 
-
-
         private void ClearSelection() {
             RecipesSelector.ClearSelection();
             RecipesSelector.CurrentCell = null;
@@ -198,8 +243,6 @@ namespace RecipePlanner.UI.Controls {
             _selectedRecipeId = item.Id;
             SelectedRecipe.Text = "Gekozen recept: " + item.Name;
         }
-
-
         private void RecipesSelector_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e) {
             if (e.RowIndex < 0) return; // header
             if (_isBinding) return;
@@ -233,6 +276,14 @@ namespace RecipePlanner.UI.Controls {
             SelectedRecipeChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        private void IngredientsFilter_SelectionChangeCommitted(object sender, EventArgs e) {
+            if (_isBinding || _isFilterBinding)
+                return;
+
+            var selectedId = IngredientsFilter.SelectedValue as int?;
+            FilterChanged?.Invoke(this, new FilterChangedEventArgs(selectedId));
+
+        }
     }
 
 }

@@ -1,8 +1,12 @@
-﻿namespace RecipePlanner.Contracts.PlannedDay {
+﻿using RecipePlanner.Contracts.Ingredient;
+
+namespace RecipePlanner.Contracts.PlannedDay {
     public sealed class DayContext {
         public List<RecipeChoiceItem> Recipes { get; set; } = new List<RecipeChoiceItem>();
         public int DayIndex { get; set; }
         public int? SelectedRecipeId { get; set; } = null;
+
+        public List<IngredientComboItem> FilterIngredients { get; set; } = new List<IngredientComboItem>();
 
 
         //later kijken of dit handig is

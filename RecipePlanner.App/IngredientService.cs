@@ -9,8 +9,8 @@ namespace RecipePlanner.App {
         public IngredientService(IRecipePlannerStorage storage) {
             _storage = storage;
         }
-        public async Task<List<IngredientListItem>> GetAllIngredientsAsync() {
-            var rows = await _storage.GetAllIngredientsAsync();
+        public async Task<List<IngredientListItem>> GetAllIngredientsForListAsync(CancellationToken ct = default) {
+            var rows = await _storage.GetAllIngredientsForListAsync();
 
             return rows
                 .Select(r => new IngredientListItem(
@@ -18,6 +18,17 @@ namespace RecipePlanner.App {
                     r.Name,
                     r.DefaultUnitName,
                     r.CountForOverlap
+                ))
+                .ToList();
+        }
+
+        public async Task<List<IngredientComboItem>> GetAllIngredientsForComboAsync(CancellationToken ct = default) {
+            var rows = await _storage.GetAllIngredientsForListAsync();
+
+            return rows
+                .Select(r => new IngredientComboItem(
+                    r.Id,
+                    r.Name
                 ))
                 .ToList();
         }

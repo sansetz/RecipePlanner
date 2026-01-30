@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using RecipePlanner.App;
+using RecipePlanner.Contracts.Filters;
+using RecipePlanner.Contracts.Ingredient;
 using RecipePlanner.Contracts.PlannedDay;
 using RecipePlanner.Contracts.Recipe;
 using RecipePlanner.UI;
@@ -10,11 +12,14 @@ namespace RecipePlanner {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly WeekplanService _weekplanService;
         private readonly RecipeService _recipeService;
+        private readonly IngredientService _ingredientService;
 
         private List<RecipePickerDayControl> _recipePickers = new List<RecipePickerDayControl>();
 
         private List<RecipeSource> _allRecipes = new List<RecipeSource>();
+        private List<IngredientComboItem> _filterIngredients = new List<IngredientComboItem>();
         private Dictionary<int, int?> _selectedRecipeIdByDay = new Dictionary<int, int?>();
+        private Dictionary<int, int?> _filteredIngredientIdByDay = new Dictionary<int, int?>();
 
         private Dictionary<int, RecipeSource> _recipeById = new();
 
@@ -27,12 +32,14 @@ namespace RecipePlanner {
         public MainForm(
             IServiceScopeFactory scopeFactory,
             WeekplanService weekplanService,
-            RecipeService recipeService
+            RecipeService recipeService,
+            IngredientService ingredientService
         ) {
             InitializeComponent();
             _scopeFactory = scopeFactory;
             _weekplanService = weekplanService;
             _recipeService = recipeService;
+            _ingredientService = ingredientService;
         }
 
         private async void MainForm_LoadAsync(object sender, EventArgs e) {
@@ -41,6 +48,7 @@ namespace RecipePlanner {
             this.WindowState = FormWindowState.Maximized;
 
             await LoadRecipesAsync();
+            await LoadFilterIngredientsAsync();
             FillRecipePickersList();
             InitRecipePickers();
         }
@@ -81,10 +89,29 @@ namespace RecipePlanner {
         private void InitRecipePickers() {
             for (int i = 0; i < 7; i++) {
                 _recipePickers[i].SelectedRecipeChanged += RecipePicker_SelectedRecipeChangedAsync;
+                _recipePickers[i].FilterChanged += RecipePicker_FilterChanged;
 
                 var context = BuildDayContext(i);
                 _recipePickers[i].SetContext(context);
             }
+        }
+        private void RecipePicker_FilterChanged(object? sender, FilterChangedEventArgs e) {
+            if (_isRefreshingPickers)
+                return;
+
+            var recipePicker = sender as RecipePickerDayControl;
+            if (recipePicker == null)
+                return;
+
+            int dayIndex = _recipePickers.IndexOf(recipePicker);
+
+            _filteredIngredientIdByDay[dayIndex] = e.IngredientId;
+
+
+            var dayContext = BuildDayContext(dayIndex);
+            _recipePickers[dayIndex].SetContext(dayContext);
+
+
         }
 
         private async void RecipePicker_SelectedRecipeChangedAsync(object? sender, EventArgs e) {
@@ -147,6 +174,9 @@ namespace RecipePlanner {
             }
         }
 
+        private async Task LoadFilterIngredientsAsync() {
+            _filterIngredients = await _ingredientService.GetAllIngredientsForComboAsync();
+        }
         private async Task LoadRecipesAsync() {
             _allRecipes = await _recipeService.GetRecipeSourcesForPlanningAsync();
             _recipeById = _allRecipes.ToDictionary(r => r.Id);
@@ -179,12 +209,28 @@ namespace RecipePlanner {
         }
 
         private DayContext BuildDayContext(int dayIndex) {
+
             var chosenElsewhere = GetChosenRecipeIdsExceptDay(dayIndex);
             var usedIngredients = GetUsedIngredientIdsExceptDay(dayIndex);
 
-            int? selectedId = _selectedRecipeIdByDay.TryGetValue(dayIndex, out var id)
-                ? id
+            int? selectedRecipeId = _selectedRecipeIdByDay.TryGetValue(dayIndex, out var recipeId)
+                ? recipeId
                 : null;
+
+            int? filterIngredientId = _filteredIngredientIdByDay.TryGetValue(dayIndex, out var ingredientId)
+                ? ingredientId
+                : null;
+
+            List<RecipeSource> filteredRecipes;
+            if (filterIngredientId != null) {
+
+                filteredRecipes = _allRecipes
+                    .Where(r => r.AllIngredients.Any(i => i.Id == filterIngredientId.Value))
+                    .ToList();
+            }
+            else {
+                filteredRecipes = _allRecipes.ToList();
+            }
 
 
             var usedRecipeDayNameById = _selectedRecipeIdByDay
@@ -195,7 +241,7 @@ namespace RecipePlanner {
                     g => WeekDayHelpers.GetDayName(WeekDayHelpers.ToDayOfWeek(g.First().Key))
                 );
 
-            var recipesForDay = _allRecipes
+            var recipesForDay = filteredRecipes
                 .Select(r => {
                     var overlapList = r.CountedIngredients
                         .Where(ci => usedIngredients.Contains(ci.Id))
@@ -227,7 +273,8 @@ namespace RecipePlanner {
             return new DayContext {
                 DayIndex = dayIndex,
                 Recipes = recipesForDay,
-                SelectedRecipeId = selectedId
+                SelectedRecipeId = selectedRecipeId,
+                FilterIngredients = _filterIngredients
             };
         }
         //var movies = _db.Movies.OrderBy(c => c.Category).ThenBy(n => n.Name)

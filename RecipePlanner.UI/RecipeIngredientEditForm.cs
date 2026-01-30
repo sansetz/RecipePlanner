@@ -140,11 +140,11 @@ namespace RecipePlanner.UI {
         }
 
         private async Task LoadIngredientAsync() {
-            var ingredients = await _ingredientService.GetAllIngredientsAsync();
+            var ingredients = await _ingredientService.GetAllIngredientsForListAsync();
             IngredientSelector.DisplayMember = nameof(IngredientListItem.Name);
             IngredientSelector.ValueMember = nameof(IngredientListItem.Id);
             IngredientSelector.DataSource = ingredients;
-            IngredientSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+            IngredientSelector.DropDownStyle = ComboBoxStyle.DropDown;
             IngredientSelector.AutoCompleteSource = AutoCompleteSource.ListItems;
             IngredientSelector.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
         }
@@ -155,7 +155,7 @@ namespace RecipePlanner.UI {
             UnitSelector.DisplayMember = nameof(Unit.Name);
             UnitSelector.ValueMember = nameof(Unit.Id);
             UnitSelector.DataSource = units;
-            UnitSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+            UnitSelector.DropDownStyle = ComboBoxStyle.DropDown;
             UnitSelector.AutoCompleteSource = AutoCompleteSource.ListItems;
             UnitSelector.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
 

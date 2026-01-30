@@ -9,7 +9,7 @@ namespace RecipePlanner.App {
             _storage = storage;
         }
 
-        public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId) {
+        public async Task<List<RecipeIngredientListItem>> GetAllRecipeIngredientsAsync(int recipeId, CancellationToken ct = default) {
             return await _storage.GetAllRecipeIngredientsAsync(recipeId);
         }
 

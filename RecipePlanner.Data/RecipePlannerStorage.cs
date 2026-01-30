@@ -10,7 +10,8 @@ namespace RecipePlanner.Data {
     public interface IRecipePlannerStorage {
         Task<List<Unit>> GetAllUnitsAsync(CancellationToken ct = default);
 
-        Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default);
+        Task<List<IngredientListItem>> GetAllIngredientsForListAsync(CancellationToken ct = default);
+        Task<List<IngredientComboItem>> GetAllIngredientsForComboAsync(CancellationToken ct = default);
         Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken ct = default);
         Task<int> AddIngredientAsync(string name, int defaultUnitId, bool countForOverlap, CancellationToken ct = default);
         Task UpdateIngredientAsync(int id, string name, int defaultUnitId, bool countForOverlap, CancellationToken ct = default);
@@ -217,7 +218,7 @@ namespace RecipePlanner.Data {
 
 
         // ***************** Ingredients *****************
-        public async Task<List<IngredientListItem>> GetAllIngredientsAsync(CancellationToken ct = default) {
+        public async Task<List<IngredientListItem>> GetAllIngredientsForListAsync(CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
             return await db.Ingredients
@@ -228,6 +229,19 @@ namespace RecipePlanner.Data {
                     i.Name,
                     i.DefaultUnit != null ? i.DefaultUnit.Name : null,
                     i.CountForOverlap
+                ))
+                .ToListAsync(ct);
+        }
+
+        public async Task<List<IngredientComboItem>> GetAllIngredientsForComboAsync(CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+
+            return await db.Ingredients
+                .AsNoTracking()
+                .OrderBy(i => i.Name)
+                .Select(i => new IngredientComboItem(
+                    i.Id,
+                    i.Name
                 ))
                 .ToListAsync(ct);
         }
@@ -336,13 +350,30 @@ namespace RecipePlanner.Data {
         public async Task<List<RecipeSource>> GetRecipeSourcesForPlanningAsync(CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
-            // 1) Basis recepten
+            //All Recipes
             var recipes = await db.Recipes
                 .AsNoTracking()
                 .Select(r => new { r.Id, r.Name, r.Info })
                 .ToListAsync(ct);
 
-            // 2) Counted ingredients (plat) met naam
+            //All used ingrediënts
+            var all = await db.RecipeIngredients
+                .AsNoTracking()
+                .Select(ri => new { ri.RecipeId, ri.IngredientId, IngredientName = ri.Ingredient.Name })
+                .Distinct()
+                .ToListAsync(ct);
+
+            var allByRecipeId = all
+                .GroupBy(x => x.RecipeId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => new CountedIngredient(x.IngredientId, x.IngredientName))
+                          .Distinct()
+                          .OrderBy(x => x.Name)
+                          .ToList()
+                );
+
+            //Ingredients that count for overlap
             var counted = await db.RecipeIngredients
                 .AsNoTracking()
                 .Where(ri => ri.Ingredient.CountForOverlap)
@@ -366,7 +397,8 @@ namespace RecipePlanner.Data {
                     r.Id,
                     r.Name,
                     r.Info,
-                    countedByRecipeId.TryGetValue(r.Id, out var list) ? list : new List<CountedIngredient>()
+                    countedByRecipeId.TryGetValue(r.Id, out var list) ? list : new List<CountedIngredient>(),
+                    allByRecipeId.TryGetValue(r.Id, out var allList) ? allList : new List<CountedIngredient>()
                 ))
                 .ToList();
         }

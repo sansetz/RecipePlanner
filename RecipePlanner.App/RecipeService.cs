@@ -11,7 +11,7 @@ namespace RecipePlanner.App {
             _storage = storage;
         }
 
-        public async Task<List<RecipeListItem>> GetAllRecipesAsync() {
+        public async Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default) {
             var rows = await _storage.GetAllRecipesAsync();
 
             return rows.Select(r => new RecipeListItem(

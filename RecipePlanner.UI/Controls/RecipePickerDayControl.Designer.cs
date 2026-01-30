@@ -29,6 +29,7 @@
             SelectedRecipe = new Label();
             ToolbarPanel = new Panel();
             label1 = new Label();
+            IngredientsFilter = new ComboBox();
             TitlePanel = new Panel();
             DayTitle = new Label();
             ControlPanel.SuspendLayout();
@@ -57,11 +58,11 @@
             RecipesSelector.ColumnHeadersVisible = false;
             RecipesSelector.Dock = DockStyle.Fill;
             RecipesSelector.EnableHeadersVisualStyles = false;
-            RecipesSelector.Location = new Point(10, 158);
+            RecipesSelector.Location = new Point(10, 152);
             RecipesSelector.Name = "RecipesSelector";
             RecipesSelector.RowHeadersVisible = false;
             RecipesSelector.RowHeadersWidth = 82;
-            RecipesSelector.Size = new Size(583, 524);
+            RecipesSelector.Size = new Size(583, 530);
             RecipesSelector.TabIndex = 5;
             RecipesSelector.CellFormatting += RecipesSelector_CellFormatting;
             RecipesSelector.CellMouseDown += RecipesSelector_CellMouseDown;
@@ -72,10 +73,11 @@
             // 
             // InfoPanel
             // 
-            InfoPanel.BackColor = SystemColors.ActiveCaption;
+            InfoPanel.BackColor = Color.SteelBlue;
             InfoPanel.BorderStyle = BorderStyle.FixedSingle;
             InfoPanel.Controls.Add(SelectedRecipe);
             InfoPanel.Dock = DockStyle.Bottom;
+            InfoPanel.ForeColor = Color.White;
             InfoPanel.Location = new Point(10, 682);
             InfoPanel.Name = "InfoPanel";
             InfoPanel.Size = new Size(583, 43);
@@ -94,21 +96,35 @@
             // 
             ToolbarPanel.BackColor = Color.Black;
             ToolbarPanel.Controls.Add(label1);
+            ToolbarPanel.Controls.Add(IngredientsFilter);
             ToolbarPanel.Dock = DockStyle.Top;
             ToolbarPanel.Location = new Point(10, 92);
             ToolbarPanel.Name = "ToolbarPanel";
-            ToolbarPanel.Size = new Size(583, 66);
+            ToolbarPanel.Padding = new Padding(10);
+            ToolbarPanel.Size = new Size(583, 60);
             ToolbarPanel.TabIndex = 2;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.ForeColor = SystemColors.ButtonHighlight;
-            label1.Location = new Point(170, 18);
+            label1.Dock = DockStyle.Left;
+            label1.ForeColor = Color.White;
+            label1.Location = new Point(10, 10);
             label1.Name = "label1";
-            label1.Size = new Size(252, 32);
-            label1.TabIndex = 0;
-            label1.Text = "Todo: filter, search, etc";
+            label1.Size = new Size(184, 32);
+            label1.TabIndex = 1;
+            label1.Text = "Filter Ingredient";
+            // 
+            // IngredientsFilter
+            // 
+            IngredientsFilter.Dock = DockStyle.Right;
+            IngredientsFilter.FormattingEnabled = true;
+            IngredientsFilter.Location = new Point(207, 10);
+            IngredientsFilter.Margin = new Padding(10, 50, 10, 10);
+            IngredientsFilter.Name = "IngredientsFilter";
+            IngredientsFilter.Size = new Size(366, 40);
+            IngredientsFilter.TabIndex = 0;
+            IngredientsFilter.SelectionChangeCommitted += IngredientsFilter_SelectionChangeCommitted;
             // 
             // TitlePanel
             // 
@@ -156,9 +172,10 @@
         private Panel ToolbarPanel;
         private Panel TitlePanel;
         private Label DayTitle;
-        private Label label1;
         private Panel InfoPanel;
         private Label SelectedRecipe;
         private DataGridView RecipesSelector;
+        private Label label1;
+        private ComboBox IngredientsFilter;
     }
 }

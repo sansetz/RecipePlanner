@@ -86,7 +86,7 @@ namespace RecipePlanner.UI {
         }
 
         private async Task LoadIngredientsAsync() {
-            var ingredients = await _ingredientService.GetAllIngredientsAsync();
+            var ingredients = await _ingredientService.GetAllIngredientsForListAsync();
             IngredientsListView.BindData(ingredients);
         }
         private void ExtraGridConfig(DataGridView grid) {

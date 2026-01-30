@@ -9,7 +9,7 @@ namespace RecipePlanner.App {
             _storage = storage;
         }
 
-        public async Task<List<Unit>> GetAllUnitsAsync() {
+        public async Task<List<Unit>> GetAllUnitsAsync(CancellationToken ct = default) {
             return await _storage.GetAllUnitsAsync();
         }
     }

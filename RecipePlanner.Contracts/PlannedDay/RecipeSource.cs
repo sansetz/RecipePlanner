@@ -6,6 +6,7 @@
         int Id,
         string Name,
         string? InfoText,
-        List<CountedIngredient> CountedIngredients
+        List<CountedIngredient> CountedIngredients,
+        List<CountedIngredient> AllIngredients
     );
 }

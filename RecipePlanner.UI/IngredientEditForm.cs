@@ -55,7 +55,7 @@ namespace RecipePlanner.UI {
             UnitSelector.DisplayMember = nameof(Unit.Name);
             UnitSelector.ValueMember = nameof(Unit.Id);
             UnitSelector.DataSource = units;
-            UnitSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+            UnitSelector.DropDownStyle = ComboBoxStyle.DropDown;
             UnitSelector.AutoCompleteSource = AutoCompleteSource.ListItems;
             UnitSelector.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
 
