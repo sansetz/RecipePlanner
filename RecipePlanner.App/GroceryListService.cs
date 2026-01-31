@@ -13,12 +13,11 @@ namespace RecipePlanner.App {
             DateOnly weekStartDate,
             CancellationToken ct = default
         ) {
-            var recipeIds = await _storage.GetRecipeIdsForWeekAsync(weekStartDate, ct);
-            if (recipeIds.Count == 0)
+            var recipeCounts = await _storage.GetRecipeCountsForWeekAsync(weekStartDate, ct);
+            if (recipeCounts.Count == 0)
                 return [];
 
-            return await _storage.GetGroceryListItemsForRecipesAsync(recipeIds, ct);
+            return await _storage.GetGroceryListItemsForRecipesAsync(recipeCounts, ct);
         }
-
     }
 }
