@@ -24,6 +24,7 @@ namespace RecipePlanner {
         private Dictionary<int, RecipeSource> _recipeById = new();
 
         private bool _isRefreshingPickers = false;
+        private bool _normalizingStartDate = false;
 
         private DateOnly _currentWeekStartDate;
 
@@ -51,6 +52,7 @@ namespace RecipePlanner {
             await LoadFilterIngredientsAsync();
             FillRecipePickersList();
             InitRecipePickers();
+            SetWeekToMonday();
         }
 
         private void IngredientsButton_Click(object sender, EventArgs e) {
@@ -285,9 +287,25 @@ namespace RecipePlanner {
                 .ToHashSet();
         }
 
-        private async void StartDatePicker_ValueChangedAsync(object sender, EventArgs e) {
+        private void SetWeekToMonday() {
+            if (_normalizingStartDate) return;
+
             var chosen = DateOnly.FromDateTime(StartDatePicker.Value);
-            _currentWeekStartDate = WeekDayHelpers.GetWeekStart(chosen);
+            var monday = WeekDayHelpers.GetWeekStart(chosen);
+
+            _currentWeekStartDate = monday;
+
+            // Normaliseer de UI (datepicker) naar maandag
+            var mondayDateTime = monday.ToDateTime(TimeOnly.MinValue);
+            if (StartDatePicker.Value.Date != mondayDateTime.Date) {
+                _normalizingStartDate = true;
+                StartDatePicker.Value = mondayDateTime;
+                _normalizingStartDate = false;
+            }
+        }
+
+        private async void StartDatePicker_ValueChangedAsync(object sender, EventArgs e) {
+            SetWeekToMonday();
 
             await ReloadSelectedRecipesForCurrentWeekAsync();
         }

@@ -276,6 +276,8 @@
             // 
             // StartDatePicker
             // 
+            StartDatePicker.CustomFormat = "dddd dd-MM-yyyy";
+            StartDatePicker.Format = DateTimePickerFormat.Custom;
             StartDatePicker.Location = new Point(34, 27);
             StartDatePicker.Name = "StartDatePicker";
             StartDatePicker.Size = new Size(458, 39);
