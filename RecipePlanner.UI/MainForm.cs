@@ -72,7 +72,7 @@ namespace RecipePlanner {
         private async void ShoppingList_ClickAsync(object sender, EventArgs e) {
             using var scope = _scopeFactory.CreateScope();
             var frm = scope.ServiceProvider.GetRequiredService<GroceryListForm>();
-            await frm.ShowDialogForCreateAsync(_currentWeekStartDate, this);
+            await frm.ShowDialogAsync(_currentWeekStartDate, this);
         }
 
         private void Exit_Click(object sender, EventArgs e) {
@@ -308,6 +308,25 @@ namespace RecipePlanner {
             SetWeekToMonday();
 
             await ReloadSelectedRecipesForCurrentWeekAsync();
+        }
+
+        private async void WeekSchedule_ClickAsync(object sender, EventArgs e) {
+            using var scope = _scopeFactory.CreateScope();
+            var frm = scope.ServiceProvider.GetRequiredService<WeekScheduleForm>();
+
+            var weekplanId = _weekplanService.GetWeekplanIdForDate(_currentWeekStartDate);
+            if (weekplanId == null || weekplanId.Result == null) {
+                MessageBox.Show(
+                    this,
+                    "Er is nog geen weekplanning voor deze week. Voeg eerst een recept toe aan een dag om de weekplanning te kunnen bekijken.",
+                    "Geen weekplanning",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
+                return;
+            }
+
+            await frm.ShowDialogAsync((int)weekplanId.Result, this);
         }
     }
 }

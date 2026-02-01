@@ -7,7 +7,7 @@ namespace RecipePlanner.UI {
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly GroceryListService _groceryListService;
-        private DateOnly _currentWeekStartDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7)); //todo: doorgeven aan form vanuit Main
+        private DateOnly _currentWeekStartDate;
 
         public GroceryListForm(
             IServiceScopeFactory scopeFactory,
@@ -18,7 +18,7 @@ namespace RecipePlanner.UI {
             _groceryListService = groceryListService;
         }
 
-        public async Task ShowDialogForCreateAsync(DateOnly currentWeekStartDate, IWin32Window? owner = null) {
+        public async Task ShowDialogAsync(DateOnly currentWeekStartDate, IWin32Window? owner = null) {
             _currentWeekStartDate = currentWeekStartDate;
 
             await LoadGroceryListAsync();

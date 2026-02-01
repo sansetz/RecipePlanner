@@ -32,6 +32,7 @@ namespace RecipePlanner {
             services.AddTransient<RecipeEditForm>();
             services.AddTransient<RecipeIngredientEditForm>();
             services.AddTransient<GroceryListForm>();
+            services.AddTransient<WeekScheduleForm>();
 
             using var serviceProvider = services.BuildServiceProvider();
             var mainForm = serviceProvider.GetRequiredService<MainForm>();

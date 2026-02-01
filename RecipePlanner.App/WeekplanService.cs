@@ -22,6 +22,14 @@ namespace RecipePlanner.App {
             return (await _storage.GetWeekplanWithDaysByIdAsync(weekplanId))!;
         }
 
+        public async Task<int?> GetWeekplanIdForDate(DateOnly date, CancellationToken ct = default) {
+
+            var weekplan = await _storage.GetWeekplanWithDaysByStartdateAsync(date, ct);
+
+
+            return weekplan == null ? null : weekplan.Id;
+        }
+
         public async Task SetPlannedDayAsync(
             DateOnly weekStartDate,
             DateOnly date,

@@ -4,6 +4,7 @@ using RecipePlanner.Contracts.Ingredient;
 using RecipePlanner.Contracts.PlannedDay;
 using RecipePlanner.Contracts.Recipe;
 using RecipePlanner.Contracts.RecipeIngredient;
+using RecipePlanner.Contracts.WeekSchedule;
 using RecipePlanner.Entities;
 
 namespace RecipePlanner.Data {
@@ -45,6 +46,8 @@ namespace RecipePlanner.Data {
         Task<List<GroceryListItem>> GetGroceryListItemsForRecipesAsync(IReadOnlyDictionary<int, int> recipeCounts, CancellationToken ct = default);
         Task<Dictionary<int, int>> GetRecipeCountsForWeekAsync(DateOnly weekStartDate, CancellationToken ct = default);
 
+        Task<List<WeekScheduleItem>> GetWeekScheduleItemsAsync(int weekplanId, CancellationToken ct = default);
+
         Task SaveSeedDataAsync(CancellationToken ct = default);
 
     }
@@ -55,6 +58,24 @@ namespace RecipePlanner.Data {
         public RecipePlannerStorage(IRecipePlannerDbContextFactory factory) {
             _factory = factory;
         }
+
+        //**************** Week Schedule ****************
+
+        public async Task<List<WeekScheduleItem>> GetWeekScheduleItemsAsync(int weekplanId, CancellationToken ct = default) {
+            await using var db = _factory.CreateDbContext();
+            return await db.PlannedDays
+                .AsNoTracking()
+                .Where(pd => pd.WeekplanId == weekplanId)
+                .OrderBy(pd => pd.Date)
+                .Select(pd => new WeekScheduleItem(
+                    pd.RecipeId != null ? pd.RecipeId.Value : 0,
+                    pd.Recipe != null ? pd.Recipe.Name : "",
+                    pd.Recipe != null ? pd.Recipe.Info : null,
+                    pd.Date
+                ))
+                .ToListAsync(ct);
+        }
+
 
 
         //**************** Grocery List ****************

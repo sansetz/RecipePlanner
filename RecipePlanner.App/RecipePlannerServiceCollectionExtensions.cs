@@ -11,6 +11,7 @@ namespace RecipePlanner.App {
             services.AddScoped<RecipeIngredientService>();
             services.AddScoped<WeekplanService>();
             services.AddScoped<GroceryListService>();
+            services.AddScoped<WeekScheduleService>();
 
 
             return services;

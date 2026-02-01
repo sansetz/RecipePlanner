@@ -49,6 +49,7 @@
             Monday = new Panel();
             MondayRecipePicker = new RecipePlanner.UI.Controls.RecipePickerDayControl();
             MenuPanel = new Panel();
+            WeekSchedule = new Button();
             StartDatePicker = new DateTimePicker();
             ShoppingList = new Button();
             RecipesButton = new Button();
@@ -71,25 +72,27 @@
             panel2.BackColor = Color.Black;
             panel2.Dock = DockStyle.Left;
             panel2.Location = new Point(0, 0);
+            panel2.Margin = new Padding(2, 1, 2, 1);
             panel2.Name = "panel2";
-            panel2.Size = new Size(119, 1761);
+            panel2.Size = new Size(64, 516);
             panel2.TabIndex = 7;
             // 
             // panel3
             // 
             panel3.BackColor = Color.Black;
             panel3.Dock = DockStyle.Right;
-            panel3.Location = new Point(2573, 0);
+            panel3.Location = new Point(1386, 0);
+            panel3.Margin = new Padding(2, 1, 2, 1);
             panel3.Name = "panel3";
-            panel3.Size = new Size(307, 1761);
+            panel3.Size = new Size(165, 516);
             panel3.TabIndex = 8;
             // 
             // Exit
             // 
-            Exit.Location = new Point(2180, 17);
-            Exit.Margin = new Padding(20);
+            Exit.Location = new Point(1174, 8);
+            Exit.Margin = new Padding(11, 9, 11, 9);
             Exit.Name = "Exit";
-            Exit.Size = new Size(153, 62);
+            Exit.Size = new Size(82, 29);
             Exit.TabIndex = 7;
             Exit.Text = "Sluiten";
             Exit.UseVisualStyleBackColor = true;
@@ -102,9 +105,10 @@
             panel4.Controls.Add(TopDaysPanel);
             panel4.Controls.Add(MenuPanel);
             panel4.Dock = DockStyle.Fill;
-            panel4.Location = new Point(119, 0);
+            panel4.Location = new Point(64, 0);
+            panel4.Margin = new Padding(2, 1, 2, 1);
             panel4.Name = "panel4";
-            panel4.Size = new Size(2454, 1761);
+            panel4.Size = new Size(1322, 516);
             panel4.TabIndex = 9;
             // 
             // BottomDaysPanel
@@ -113,70 +117,78 @@
             BottomDaysPanel.Controls.Add(Saturday);
             BottomDaysPanel.Controls.Add(Friday);
             BottomDaysPanel.Dock = DockStyle.Fill;
-            BottomDaysPanel.Location = new Point(0, 935);
+            BottomDaysPanel.Location = new Point(0, 438);
+            BottomDaysPanel.Margin = new Padding(2, 1, 2, 1);
             BottomDaysPanel.Name = "BottomDaysPanel";
-            BottomDaysPanel.Padding = new Padding(20, 0, 20, 20);
-            BottomDaysPanel.Size = new Size(2454, 734);
+            BottomDaysPanel.Padding = new Padding(11, 0, 11, 9);
+            BottomDaysPanel.Size = new Size(1322, 35);
             BottomDaysPanel.TabIndex = 14;
             // 
             // Sunday
             // 
             Sunday.Controls.Add(SundayRecipePicker);
             Sunday.Dock = DockStyle.Left;
-            Sunday.Location = new Point(1220, 0);
+            Sunday.Location = new Point(657, 0);
+            Sunday.Margin = new Padding(2, 1, 2, 1);
             Sunday.Name = "Sunday";
-            Sunday.Size = new Size(600, 714);
+            Sunday.Size = new Size(323, 26);
             Sunday.TabIndex = 2;
             // 
             // SundayRecipePicker
             // 
             SundayRecipePicker.Dock = DockStyle.Fill;
             SundayRecipePicker.Location = new Point(0, 0);
+            SundayRecipePicker.Margin = new Padding(1, 0, 1, 0);
             SundayRecipePicker.Name = "SundayRecipePicker";
-            SundayRecipePicker.Size = new Size(600, 714);
+            SundayRecipePicker.Size = new Size(323, 26);
             SundayRecipePicker.TabIndex = 0;
             // 
             // Saturday
             // 
             Saturday.Controls.Add(SaturdayRecipePicker);
             Saturday.Dock = DockStyle.Left;
-            Saturday.Location = new Point(620, 0);
+            Saturday.Location = new Point(334, 0);
+            Saturday.Margin = new Padding(2, 1, 2, 1);
             Saturday.Name = "Saturday";
-            Saturday.Size = new Size(600, 714);
+            Saturday.Size = new Size(323, 26);
             Saturday.TabIndex = 1;
             // 
             // SaturdayRecipePicker
             // 
             SaturdayRecipePicker.Dock = DockStyle.Fill;
             SaturdayRecipePicker.Location = new Point(0, 0);
+            SaturdayRecipePicker.Margin = new Padding(1, 0, 1, 0);
             SaturdayRecipePicker.Name = "SaturdayRecipePicker";
-            SaturdayRecipePicker.Size = new Size(600, 714);
+            SaturdayRecipePicker.Size = new Size(323, 26);
             SaturdayRecipePicker.TabIndex = 0;
             // 
             // Friday
             // 
             Friday.Controls.Add(FridayRecipePicker);
             Friday.Dock = DockStyle.Left;
-            Friday.Location = new Point(20, 0);
+            Friday.Location = new Point(11, 0);
+            Friday.Margin = new Padding(2, 1, 2, 1);
             Friday.Name = "Friday";
-            Friday.Size = new Size(600, 714);
+            Friday.Size = new Size(323, 26);
             Friday.TabIndex = 0;
             // 
             // FridayRecipePicker
             // 
             FridayRecipePicker.Dock = DockStyle.Fill;
             FridayRecipePicker.Location = new Point(0, 0);
+            FridayRecipePicker.Margin = new Padding(1, 0, 1, 0);
             FridayRecipePicker.Name = "FridayRecipePicker";
-            FridayRecipePicker.Size = new Size(600, 714);
+            FridayRecipePicker.Size = new Size(323, 26);
             FridayRecipePicker.TabIndex = 0;
             // 
             // panel1
             // 
             panel1.BackColor = Color.Black;
             panel1.Dock = DockStyle.Bottom;
-            panel1.Location = new Point(0, 1669);
+            panel1.Location = new Point(0, 473);
+            panel1.Margin = new Padding(2, 1, 2, 1);
             panel1.Name = "panel1";
-            panel1.Size = new Size(2454, 92);
+            panel1.Size = new Size(1322, 43);
             panel1.TabIndex = 13;
             // 
             // TopDaysPanel
@@ -186,83 +198,93 @@
             TopDaysPanel.Controls.Add(Tuesday);
             TopDaysPanel.Controls.Add(Monday);
             TopDaysPanel.Dock = DockStyle.Top;
-            TopDaysPanel.Location = new Point(0, 102);
+            TopDaysPanel.Location = new Point(0, 48);
+            TopDaysPanel.Margin = new Padding(2, 1, 2, 1);
             TopDaysPanel.Name = "TopDaysPanel";
-            TopDaysPanel.Padding = new Padding(20, 0, 20, 0);
-            TopDaysPanel.Size = new Size(2454, 833);
+            TopDaysPanel.Padding = new Padding(11, 0, 11, 0);
+            TopDaysPanel.Size = new Size(1322, 390);
             TopDaysPanel.TabIndex = 11;
             // 
             // Thursday
             // 
             Thursday.Controls.Add(ThursdayRecipePicker);
             Thursday.Dock = DockStyle.Fill;
-            Thursday.Location = new Point(1820, 0);
+            Thursday.Location = new Point(980, 0);
+            Thursday.Margin = new Padding(2, 1, 2, 1);
             Thursday.Name = "Thursday";
-            Thursday.Size = new Size(614, 833);
+            Thursday.Size = new Size(331, 390);
             Thursday.TabIndex = 12;
             // 
             // ThursdayRecipePicker
             // 
             ThursdayRecipePicker.Dock = DockStyle.Fill;
             ThursdayRecipePicker.Location = new Point(0, 0);
+            ThursdayRecipePicker.Margin = new Padding(1, 0, 1, 0);
             ThursdayRecipePicker.Name = "ThursdayRecipePicker";
-            ThursdayRecipePicker.Size = new Size(614, 833);
+            ThursdayRecipePicker.Size = new Size(331, 390);
             ThursdayRecipePicker.TabIndex = 0;
             // 
             // Wednesday
             // 
             Wednesday.Controls.Add(WednesdayRecipePicker);
             Wednesday.Dock = DockStyle.Left;
-            Wednesday.Location = new Point(1220, 0);
+            Wednesday.Location = new Point(657, 0);
+            Wednesday.Margin = new Padding(2, 1, 2, 1);
             Wednesday.Name = "Wednesday";
-            Wednesday.Size = new Size(600, 833);
+            Wednesday.Size = new Size(323, 390);
             Wednesday.TabIndex = 11;
             // 
             // WednesdayRecipePicker
             // 
             WednesdayRecipePicker.Dock = DockStyle.Fill;
             WednesdayRecipePicker.Location = new Point(0, 0);
+            WednesdayRecipePicker.Margin = new Padding(1, 0, 1, 0);
             WednesdayRecipePicker.Name = "WednesdayRecipePicker";
-            WednesdayRecipePicker.Size = new Size(600, 833);
+            WednesdayRecipePicker.Size = new Size(323, 390);
             WednesdayRecipePicker.TabIndex = 0;
             // 
             // Tuesday
             // 
             Tuesday.Controls.Add(TuesdayRecipePicker);
             Tuesday.Dock = DockStyle.Left;
-            Tuesday.Location = new Point(620, 0);
+            Tuesday.Location = new Point(334, 0);
+            Tuesday.Margin = new Padding(2, 1, 2, 1);
             Tuesday.Name = "Tuesday";
-            Tuesday.Size = new Size(600, 833);
+            Tuesday.Size = new Size(323, 390);
             Tuesday.TabIndex = 10;
             // 
             // TuesdayRecipePicker
             // 
             TuesdayRecipePicker.Dock = DockStyle.Fill;
             TuesdayRecipePicker.Location = new Point(0, 0);
+            TuesdayRecipePicker.Margin = new Padding(1, 0, 1, 0);
             TuesdayRecipePicker.Name = "TuesdayRecipePicker";
-            TuesdayRecipePicker.Size = new Size(600, 833);
+            TuesdayRecipePicker.Size = new Size(323, 390);
             TuesdayRecipePicker.TabIndex = 0;
             // 
             // Monday
             // 
             Monday.Controls.Add(MondayRecipePicker);
             Monday.Dock = DockStyle.Left;
-            Monday.Location = new Point(20, 0);
+            Monday.Location = new Point(11, 0);
+            Monday.Margin = new Padding(2, 1, 2, 1);
             Monday.Name = "Monday";
-            Monday.Size = new Size(600, 833);
+            Monday.Size = new Size(323, 390);
             Monday.TabIndex = 9;
             // 
             // MondayRecipePicker
             // 
             MondayRecipePicker.Dock = DockStyle.Fill;
             MondayRecipePicker.Location = new Point(0, 0);
+            MondayRecipePicker.Margin = new Padding(1, 0, 1, 0);
             MondayRecipePicker.Name = "MondayRecipePicker";
-            MondayRecipePicker.Size = new Size(600, 833);
+            MondayRecipePicker.Size = new Size(323, 390);
             MondayRecipePicker.TabIndex = 0;
             // 
             // MenuPanel
             // 
             MenuPanel.BackColor = Color.Black;
+            MenuPanel.Controls.Add(WeekSchedule);
             MenuPanel.Controls.Add(StartDatePicker);
             MenuPanel.Controls.Add(ShoppingList);
             MenuPanel.Controls.Add(Exit);
@@ -270,25 +292,38 @@
             MenuPanel.Controls.Add(IngredientsButton);
             MenuPanel.Dock = DockStyle.Top;
             MenuPanel.Location = new Point(0, 0);
+            MenuPanel.Margin = new Padding(2, 1, 2, 1);
             MenuPanel.Name = "MenuPanel";
-            MenuPanel.Size = new Size(2454, 102);
+            MenuPanel.Size = new Size(1322, 48);
             MenuPanel.TabIndex = 10;
+            // 
+            // WeekSchedule
+            // 
+            WeekSchedule.Location = new Point(426, 10);
+            WeekSchedule.Name = "WeekSchedule";
+            WeekSchedule.Size = new Size(104, 26);
+            WeekSchedule.TabIndex = 11;
+            WeekSchedule.Text = "Weekoverzicht";
+            WeekSchedule.UseVisualStyleBackColor = true;
+            WeekSchedule.Click += WeekSchedule_ClickAsync;
             // 
             // StartDatePicker
             // 
             StartDatePicker.CustomFormat = "dddd dd-MM-yyyy";
             StartDatePicker.Format = DateTimePickerFormat.Custom;
-            StartDatePicker.Location = new Point(34, 27);
+            StartDatePicker.Location = new Point(18, 13);
+            StartDatePicker.Margin = new Padding(2, 1, 2, 1);
             StartDatePicker.Name = "StartDatePicker";
-            StartDatePicker.Size = new Size(458, 39);
+            StartDatePicker.Size = new Size(248, 23);
             StartDatePicker.TabIndex = 10;
             StartDatePicker.ValueChanged += StartDatePicker_ValueChangedAsync;
             // 
             // ShoppingList
             // 
-            ShoppingList.Location = new Point(1015, 19);
+            ShoppingList.Location = new Point(547, 9);
+            ShoppingList.Margin = new Padding(2, 1, 2, 1);
             ShoppingList.Name = "ShoppingList";
-            ShoppingList.Size = new Size(270, 62);
+            ShoppingList.Size = new Size(145, 29);
             ShoppingList.TabIndex = 9;
             ShoppingList.Text = "Boodschappenlijstje";
             ShoppingList.UseVisualStyleBackColor = true;
@@ -296,9 +331,10 @@
             // 
             // RecipesButton
             // 
-            RecipesButton.Location = new Point(1605, 19);
+            RecipesButton.Location = new Point(864, 9);
+            RecipesButton.Margin = new Padding(2, 1, 2, 1);
             RecipesButton.Name = "RecipesButton";
-            RecipesButton.Size = new Size(248, 62);
+            RecipesButton.Size = new Size(134, 29);
             RecipesButton.TabIndex = 5;
             RecipesButton.Text = "Recepten beheren";
             RecipesButton.UseVisualStyleBackColor = true;
@@ -306,9 +342,10 @@
             // 
             // IngredientsButton
             // 
-            IngredientsButton.Location = new Point(1318, 19);
+            IngredientsButton.Location = new Point(710, 9);
+            IngredientsButton.Margin = new Padding(2, 1, 2, 1);
             IngredientsButton.Name = "IngredientsButton";
-            IngredientsButton.Size = new Size(281, 62);
+            IngredientsButton.Size = new Size(151, 29);
             IngredientsButton.TabIndex = 4;
             IngredientsButton.Text = "Ingredienten beheren";
             IngredientsButton.UseVisualStyleBackColor = true;
@@ -316,13 +353,14 @@
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(13F, 32F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(2880, 1761);
+            ClientSize = new Size(1551, 516);
             Controls.Add(panel4);
             Controls.Add(panel3);
             Controls.Add(panel2);
             FormBorderStyle = FormBorderStyle.None;
+            Margin = new Padding(2, 1, 2, 1);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "My Recipe Planner";
@@ -368,5 +406,6 @@
         private UI.Controls.RecipePickerDayControl FridayRecipePicker;
         private Button ShoppingList;
         private DateTimePicker StartDatePicker;
+        private Button WeekSchedule;
     }
 }
