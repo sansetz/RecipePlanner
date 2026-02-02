@@ -24,6 +24,7 @@
         /// </summary>
         private void InitializeComponent() {
             WeekSchedule = new RichTextBox();
+            Export = new Button();
             SuspendLayout();
             // 
             // WeekSchedule
@@ -34,11 +35,22 @@
             WeekSchedule.TabIndex = 0;
             WeekSchedule.Text = "";
             // 
+            // Export
+            // 
+            Export.Location = new Point(482, 303);
+            Export.Name = "Export";
+            Export.Size = new Size(112, 31);
+            Export.TabIndex = 1;
+            Export.Text = "Export";
+            Export.UseVisualStyleBackColor = true;
+            Export.Click += Export_ClickAsync;
+            // 
             // WeekScheduleForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(607, 307);
+            ClientSize = new Size(607, 342);
+            Controls.Add(Export);
             Controls.Add(WeekSchedule);
             Name = "WeekScheduleForm";
             Text = "WeekScheduleForm";
@@ -48,5 +60,6 @@
         #endregion
 
         private RichTextBox WeekSchedule;
+        private Button Export;
     }
 }
