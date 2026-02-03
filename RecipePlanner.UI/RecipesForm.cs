@@ -94,20 +94,21 @@ namespace RecipePlanner.UI {
         }
         private void ExtraGridConfig(DataGridView grid) {
 
+            var nameColumn = grid.Columns["Name"];
+            if (nameColumn != null) {
+                nameColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                nameColumn.HeaderText = "Naam";
+            }
+
             var infoColumn = grid.Columns["Info"];
             if (infoColumn != null) {
-                infoColumn.Width = 500;
+                infoColumn.Width = 300;
                 infoColumn.HeaderText = "Info";
             }
 
             var defUnitColumn = grid.Columns["Preptime"];
             if (defUnitColumn != null) {
                 defUnitColumn.HeaderText = "Bereidingstijd";
-            }
-            var nameColumn = grid.Columns["Name"];
-            if (nameColumn != null) {
-                nameColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                nameColumn.HeaderText = "Naam";
             }
         }
     }

@@ -44,15 +44,30 @@ namespace RecipePlanner {
         }
 
         private async void MainForm_LoadAsync(object sender, EventArgs e) {
-            //this.TopMost = true;
-            this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
 
+            LayoutConfig(this.Width, this.Height);
             await LoadRecipesAsync();
             await LoadFilterIngredientsAsync();
             FillRecipePickersList();
             InitRecipePickers();
             SetWeekToMonday();
+        }
+
+        private void LayoutConfig(int screenwidth, int screenheight) {
+            var daywidth = (screenwidth - 20) / 4;
+            var dayheight = (screenheight - 58) / 2;
+
+            TopDaysPanel.Height = dayheight;
+            BottomDaysPanel.Height = dayheight;
+
+            Monday.Width = daywidth;
+            Tuesday.Width = daywidth;
+            Wednesday.Width = daywidth;
+            Thursday.Width = daywidth;
+            Friday.Width = daywidth;
+            Saturday.Width = daywidth;
+            Sunday.Width = daywidth;
         }
 
         private void IngredientsButton_Click(object sender, EventArgs e) {
@@ -75,9 +90,7 @@ namespace RecipePlanner {
             await frm.ShowDialogAsync(_currentWeekStartDate, this);
         }
 
-        private void Exit_Click(object sender, EventArgs e) {
-            Close();
-        }
+
         private void FillRecipePickersList() {
             _recipePickers.Add(MondayRecipePicker);
             _recipePickers.Add(TuesdayRecipePicker);
