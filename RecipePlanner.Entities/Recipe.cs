@@ -6,6 +6,7 @@ namespace RecipePlanner.Entities {
         public required string Name { get; set; }
         public PrepTime PrepTime { get; set; }
         public string? Info { get; set; }
+        public bool NoFreshIngredients { get; set; } = false;
         public List<RecipeIngredient> RecipeIngredients { get; set; } = [];
 
     }

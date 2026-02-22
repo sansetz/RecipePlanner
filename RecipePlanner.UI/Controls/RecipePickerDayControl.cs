@@ -277,13 +277,21 @@ namespace RecipePlanner.UI.Controls {
         }
 
         private void IngredientsFilter_SelectionChangeCommitted(object sender, EventArgs e) {
+            FilterChangedInternal();
+        }
+
+        private void NoFreshIngredientsFilter_CheckedChanged(object sender, EventArgs e) {
+            FilterChangedInternal();
+        }
+
+        private void FilterChangedInternal() {
             if (_isBinding || _isFilterBinding)
                 return;
 
             var selectedId = IngredientsFilter.SelectedValue as int?;
-            FilterChanged?.Invoke(this, new FilterChangedEventArgs(selectedId));
-
+            var noFreshIngredients = NoFreshIngredientsFilter.Checked;
+            FilterChanged?.Invoke(this, new FilterChangedEventArgs(selectedId, noFreshIngredients));
         }
-    }
 
+    }
 }

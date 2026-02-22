@@ -18,7 +18,8 @@ namespace RecipePlanner.App {
                 r.Id,
                 r.Name,
                 r.Info,
-                r.PrepTime
+                r.PrepTime,
+                r.NoFreshIngredients
             )).ToList();
         }
 
@@ -30,6 +31,7 @@ namespace RecipePlanner.App {
             string name,
             PrepTime preptime,
             string info,
+            bool noFreshIngredients,
             CancellationToken ct = default
         ) {
             name = name.Trim();
@@ -37,9 +39,9 @@ namespace RecipePlanner.App {
                 throw new ArgumentException("Name is required", nameof(name));
 
             if (info == String.Empty)
-                return await _storage.AddRecipeAsync(name, preptime, null, ct);
+                return await _storage.AddRecipeAsync(name, preptime, null, noFreshIngredients, ct);
 
-            return await _storage.AddRecipeAsync(name, preptime, info, ct);
+            return await _storage.AddRecipeAsync(name, preptime, info, noFreshIngredients, ct);
 
         }
         public async Task UpdateRecipeAsync(
@@ -47,13 +49,14 @@ namespace RecipePlanner.App {
             string name,
             PrepTime preptime,
             string info,
+            bool noFreshIngredients,
             CancellationToken ct = default
         ) {
             name = name.Trim();
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is required.", nameof(name));
 
-            await _storage.UpdateRecipeAsync(id, name, preptime, info, ct);
+            await _storage.UpdateRecipeAsync(id, name, preptime, info, noFreshIngredients, ct);
         }
 
         public async Task DeleteRecipeAsync(int id, CancellationToken ct = default) {

@@ -9,6 +9,7 @@
         int Id,
         string Name,
         string? Info,
-        PrepTime? PrepTime
+        PrepTime? PrepTime,
+        bool NoFreshIngredients
     );
 }

@@ -19,7 +19,7 @@ namespace RecipePlanner {
         private List<RecipeSource> _allRecipes = new List<RecipeSource>();
         private List<IngredientComboItem> _filterIngredients = new List<IngredientComboItem>();
         private Dictionary<int, int?> _selectedRecipeIdByDay = new Dictionary<int, int?>();
-        private Dictionary<int, int?> _filteredIngredientIdByDay = new Dictionary<int, int?>();
+        private Dictionary<int, Filter?> _filterByDay = new Dictionary<int, Filter?>();
 
         private Dictionary<int, RecipeSource> _recipeById = new();
 
@@ -120,8 +120,10 @@ namespace RecipePlanner {
 
             int dayIndex = _recipePickers.IndexOf(recipePicker);
 
-            _filteredIngredientIdByDay[dayIndex] = e.IngredientId;
-
+            _filterByDay[dayIndex] = new Filter {
+                IngredientId = e.IngredientId,
+                NoFreshIngredients = e.NoFreshIngredients
+            };
 
             var dayContext = BuildDayContext(dayIndex);
             _recipePickers[dayIndex].SetContext(dayContext);
@@ -232,16 +234,28 @@ namespace RecipePlanner {
                 ? recipeId
                 : null;
 
-            int? filterIngredientId = _filteredIngredientIdByDay.TryGetValue(dayIndex, out var ingredientId)
-                ? ingredientId
-                : null;
+            _filterByDay.TryGetValue(dayIndex, out var filter);
+
+
+
+            //int? filterIngredientId = _filteredIngredientIdByDay.TryGetValue(dayIndex, out var filter)
+            //    ? ingredientId
+            //    : null;
 
             List<RecipeSource> filteredRecipes;
-            if (filterIngredientId != null) {
+            if (filter != null) {
 
-                filteredRecipes = _allRecipes
-                    .Where(r => r.AllIngredients.Any(i => i.Id == filterIngredientId.Value))
-                    .ToList();
+                var query = from r in _allRecipes
+                            select r;
+
+                if (filter.NoFreshIngredients != null && filter.NoFreshIngredients.Value) {
+                    query = query.Where(r => r.NoFreshIngredients == filter.NoFreshIngredients);
+                }
+                if (filter.IngredientId != null) {
+                    query = query.Where(r => r.AllIngredients.Any(i => i.Id == filter.IngredientId));
+                }
+
+                filteredRecipes = query.ToList();
             }
             else {
                 filteredRecipes = _allRecipes.ToList();

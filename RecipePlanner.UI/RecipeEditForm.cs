@@ -56,6 +56,7 @@ namespace RecipePlanner.UI {
             _recipeId = recipe.Id;
             RecipeName.Text = recipe.Name;
             RecipeInfo.Text = recipe.Info;
+            NoFreshIngredients.Checked = recipe.NoFreshIngredients;
 
             FillPreptimes();
             PrepTimeSelector.SelectedItem = recipe.PrepTime;
@@ -81,7 +82,7 @@ namespace RecipePlanner.UI {
 
                 var prepTime = (PrepTime)PrepTimeSelector.SelectedValue!; //validate already checked for null
 
-                await SaveRecipeToDB(RecipeName.Text, prepTime, RecipeInfo.Text);
+                await SaveRecipeToDB(RecipeName.Text, prepTime, RecipeInfo.Text, NoFreshIngredients.Checked);
 
                 DialogResult = DialogResult.OK;
                 this.Close();
@@ -115,13 +116,13 @@ namespace RecipePlanner.UI {
 
 
 
-        private async Task SaveRecipeToDB(string name, PrepTime preptime, string info) {
+        private async Task SaveRecipeToDB(string name, PrepTime preptime, string info, bool noFreshIngredients) {
             //first create recipe
             if (_recipeId == null) {
-                _recipeId = await _recipeService.CreateRecipeAsync(name, preptime, info);
+                _recipeId = await _recipeService.CreateRecipeAsync(name, preptime, info, noFreshIngredients);
             }
             else {
-                await _recipeService.UpdateRecipeAsync(_recipeId.Value, name, preptime, info);
+                await _recipeService.UpdateRecipeAsync(_recipeId.Value, name, preptime, info, noFreshIngredients);
             }
 
             //sync ingredients

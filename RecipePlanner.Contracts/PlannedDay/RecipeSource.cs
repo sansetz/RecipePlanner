@@ -6,6 +6,7 @@
         int Id,
         string Name,
         string? InfoText,
+        bool NoFreshIngredients,
         List<CountedIngredient> CountedIngredients,
         List<CountedIngredient> AllIngredients
     );

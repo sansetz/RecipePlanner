@@ -20,8 +20,8 @@ namespace RecipePlanner.Data {
 
         Task<List<RecipeListItem>> GetAllRecipesAsync(CancellationToken ct = default);
         Task<Recipe?> GetRecipeByIdAsync(int id, CancellationToken ct = default);
-        Task<int> AddRecipeAsync(string name, PrepTime preptime, string? info, CancellationToken ct = default);
-        Task UpdateRecipeAsync(int id, string name, PrepTime preptime, string? info, CancellationToken ct = default);
+        Task<int> AddRecipeAsync(string name, PrepTime preptime, string? info, bool noFreshIngredients, CancellationToken ct = default);
+        Task UpdateRecipeAsync(int id, string name, PrepTime preptime, string? info, bool noFreshIngredients, CancellationToken ct = default);
         Task DeleteRecipeAsync(int id, CancellationToken ct = default);
         Task<List<RecipeSource>> GetRecipeSourcesForPlanningAsync(CancellationToken ct = default);
 
@@ -340,7 +340,8 @@ namespace RecipePlanner.Data {
                     r.Id,
                     r.Name,
                     r.Info,
-                    r.PrepTime
+                    r.PrepTime,
+                    r.NoFreshIngredients
             ))
             .ToListAsync(ct);
         }
@@ -352,17 +353,17 @@ namespace RecipePlanner.Data {
                 .FirstOrDefaultAsync(i => i.Id == id, ct);
         }
 
-        public async Task<int> AddRecipeAsync(string name, PrepTime preptime, string? info, CancellationToken ct = default) {
+        public async Task<int> AddRecipeAsync(string name, PrepTime preptime, string? info, bool noFreshIngredients, CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
-            var recipe = new Recipe { Name = name, PrepTime = preptime, Info = info };
+            var recipe = new Recipe { Name = name, PrepTime = preptime, Info = info, NoFreshIngredients = noFreshIngredients };
 
             db.Recipes.Add(recipe);
             await db.SaveChangesAsync(ct);
 
             return recipe.Id;
         }
-        public async Task UpdateRecipeAsync(int id, string name, PrepTime preptime, string? info, CancellationToken ct = default) {
+        public async Task UpdateRecipeAsync(int id, string name, PrepTime preptime, string? info, bool noFreshIngredients, CancellationToken ct = default) {
             await using var db = _factory.CreateDbContext();
 
             var recipe = await db.Recipes.FindAsync([id], ct);
@@ -372,6 +373,7 @@ namespace RecipePlanner.Data {
             recipe.Name = name;
             recipe.PrepTime = preptime;
             recipe.Info = info;
+            recipe.NoFreshIngredients = noFreshIngredients;
 
             await db.SaveChangesAsync(ct);
         }
@@ -393,7 +395,7 @@ namespace RecipePlanner.Data {
             //All Recipes
             var recipes = await db.Recipes
                 .AsNoTracking()
-                .Select(r => new { r.Id, r.Name, r.Info })
+                .Select(r => new { r.Id, r.Name, r.Info, r.NoFreshIngredients })
                 .ToListAsync(ct);
 
             //All used ingrediënts
@@ -437,6 +439,7 @@ namespace RecipePlanner.Data {
                     r.Id,
                     r.Name,
                     r.Info,
+                    r.NoFreshIngredients,
                     countedByRecipeId.TryGetValue(r.Id, out var list) ? list : new List<CountedIngredient>(),
                     allByRecipeId.TryGetValue(r.Id, out var allList) ? allList : new List<CountedIngredient>()
                 ))
